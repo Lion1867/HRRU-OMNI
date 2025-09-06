@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>IT-WorkRu - интеллектуальная платформа для поиска вакансий и образовательных ресурсов</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png">
+    <style>
+
+        html, body {
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Растягиваем шапку на всю ширину */
+            box-sizing: border-box;
+        }
+        header a {
+            text-decoration: none;
+            color: #000;
+            margin-right: 35px;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #0056b3;
+        }
+        .login-btn {
+            font-weight: bold;
+            background-color: #0056b3;
+            color: #fff;
+            padding: 10px 23px;
+            border-radius: 12px;
+            text-decoration: none;
+        }
+        .login-btn:hover {
+            background-color: #003f8c;
+            color: white;
+        }
+        .main-content {
+            position: relative;
+            text-align: center;
+            min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+            padding: 20px;
+        }
+        .main-content h1 {
+            font-size: 32px;
+            color: #333;
+        }
+        .main-content p {
+            font-size: 18px;
+            color: #333;
+        }
+        .search-box {
+            margin-top: 45px;
+            display: flex;
+            align-items: center;
+            border: 2px solid #DCDCDC; /* Граница для всего блока */
+            border-radius: 5px; /* Скругление углов всего блока */
+
+        }
+
+        .search-box input[type="text"] {
+            padding-top: 17.5px; padding-bottom: 17.5px; padding-left: 23px;
+            width: 400px; /* Увеличение ширины */
+            font-size: 16px;
+            border: none; /* Убираем границу у input */
+            flex-grow: 1; /* Дает input занимать доступное пространство */
+        }
+
+        .search-box button {
+            padding: 19px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #003f8c;
+        }
+        .search-box input[type="text"]:focus {
+        outline: none; /* Добавляем свою рамку при фокусе */
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+/* Для контейнера выпадающего списка */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Скрытый контент выпадающего списка */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    top: 240%; /* Используем позиционирование для отображения списка */
+    text-align: left;
+}
+
+/* Псевдоэлемент для создания буферной зоны */
+.dropdown::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 46px; /* Высота буферной зоны */
+    background: transparent;
+    z-index: 0;
+}
+
+/* Показываем выпадающий список при наведении */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Оформление ссылок внутри выпадающего списка */
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px; /* Добавляем отступы внутри элементов */
+    width: 100%; /* Ссылка занимает всю ширину */
+    box-sizing: border-box; /* Включаем отступы и границы в размеры элемента */
+    color: black;
+    text-decoration: none;
+}
+
+/* При наведении на ссылку изменяется цвет фона по всей ширине */
+.dropdown-content a:hover {
+    background-color: #f0f0f0; /* Более светлый цвет фона */
+    border: none; /* Убираем границы */
+    color: #0056b3; /* Изменяем цвет текста */
+}
+
+/* Стили для изображений в левом верхнем и правом нижнем углах */
+.main-content img:first-of-type {
+    position: absolute;
+    top: -20px;
+    left: 0px;
+    width: 280px; /* Настройте размер изображения по необходимости */
+    height: auto;
+}
+.main-content img:last-of-type {
+    position: absolute;
+    bottom: 140px;
+    right: 0px;
+    width: 550px; /* Настройте размер изображения по необходимости */
+    height: auto;
+}
+
+         :root {
+  --c-black: #000000;
+  --c-dark: #202020;
+  --c-white: #ffffff;
+  --c-light: #eeeeee;
+  --c-gray: #bbbbbb;
+  --c-cyan: #afc4e4;
+  --c-blue: #1D55A6;
+  --c-red: #f66766;
+
+  --fz-s: 14px;
+  --fz-m: 16px;
+  --fz-l: 18px;
+  --fz-xl: 24px;
+  --fz-xxl: 36px;
+}
+
+.btn {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-blue);
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+
+.form__title {
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+  margin: 45px 0 30px;
+}
+.form__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+.form__aside {
+  width: 25%;
+}
+.form__content {
+  width: 75;
+}
+
+.form__img-box {border: 1px solid var(--c-gray);
+  width: 85%;
+
+
+  background-color: white;
+  border-radius: 1rem / 1rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem; margin-top: 0.5rem;
+}
+
+.form__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.form__person-img__box {
+  aspect-ratio: 4/1;
+  margin-top: 10px;
+}
+
+.form__img-text {
+  font-size: var(--fz-s);
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+.form__button-title {
+  width: 85%;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+.form__subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status {
+}
+.form__status-label {
+  display: block;
+  font-size: var(--fz-m);
+  margin-bottom: 20px;
+}
+.form__status-input {
+}
+.form__status-text {
+  font-size: var(--fz-s);
+  color: var(--c-gray);
+  margin-top: 5px;
+}
+
+.form__person {
+}
+.form__content-title {
+  margin-top: 45px;
+}
+.form__content-title:first-child {
+  margin-top: 0px;
+}
+.form__person-label {
+  display: block;
+  margin-bottom: 15px;
+}
+.form__person-span {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.form__person-label:has(.form__person-input:required) .form__person-span::after,
+.required::after {
+  content: " *";
+  font-size: 1.3em;
+  color: var(--c-red);
+  margin-bottom: 15px;
+}
+
+.form__person-input {
+  width: 100%;
+  padding: 10px;
+  font-size: var(--fz-m);
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  background-color: #fff;
+}
+
+.form__person-radio__box {
+  display: flex;
+  grid-gap: 45px;
+}
+.form__person-label__radio {
+  display: block;
+  font-weight: 500;
+}
+.form__person-radio,
+.form__person-checkbox {
+  margin-right: 3px;
+}
+
+.form__person-label__checkbox {
+  font-weight: 700;
+}
+
+.form__password-button {
+  margin-bottom: 15px;
+  padding: 10px 30px;
+}
+.form__link-delete {
+  display: block;
+  color: var(--c-gray);
+  text-decoration: underline;
+  margin-bottom: 40px;
+}
+
+.form__button {
+  font-size: var(--fz-l);
+  width: 100%;
+  padding: 20px;
+}
+
+.form__aside-container {
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  padding: 25px 0;
+}
+
+.form__aside-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.form__aside-list {
+}
+
+.form__aside-item {
+  padding: 7px 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.form__aside-item:hover {
+  background-color: var(--c-light);
+}
+
+.form__aside-link {
+}
+
+.form__resume-box {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio {
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio:last-child {
+  margin-bottom: 0;
+}
+
+.form__button-content {
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.form__person-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form__person-box .form__status-input {
+  margin-right: 10px;
+}
+
+.form__person-box .form__status-label {
+  font-size: var(--fz-s);
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form__person-input__file {
+  display: none;
+}
+
+.form__person-input__file-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.form__person-input__file-img {
+  height: 27px;
+  aspect-ratio: 1/2;
+}
+
+.form__person-plus__box {
+  position: relative;
+}
+
+.form__person-plus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--c-blue);
+  height: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: var(--c-white);
+  border-radius: 0.5rem;
+}
+
+.form__person-span_mb {
+  margin-bottom: 15px;
+}
+
+.form__person-mtb {
+  margin: 30px 0;
+}
+
+ /* account.component.html */
+
+.account__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 40px 0 30px;
+}
+
+.account__title-subtitle {
+  margin-right: auto;
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+}
+
+.account__title-text {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+}
+
+.account__title-button {
+  font-size: var(--fz-l);
+  padding: 10px 30px;
+}
+
+.account__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+
+.account__aside {
+  width: 20%;
+}
+.account__content {
+  width: 80%;
+}
+
+.account__name {
+  font-size: var(--fz-l);
+  font-weight: 700;
+  text-align: center;
+  margin: 10px 0;
+}
+.account__favourites {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fz-s);
+  margin-bottom: 20px;
+}
+.account__favourites-link {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.account__favourites-count {
+  border-radius: 100%;
+  background-color: var(--c-light);
+  padding: 0 5px;
+}
+.account__button-edit {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.account__border {
+
+  position: relative;
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  padding: 35px;
+  overflow: hidden;
+}
+.account__border-subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+.account__border-text {
+  margin-bottom: 25px;
+}
+.account__border-link__span {
+  display: block;
+  margin-bottom: 35px;
+}
+.account__border-link__span span {
+  color: var(--c-blue);
+}
+.account__border-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-item {
+  width: 23%;
+}
+.account__border-link {
+  width: 100%;
+  aspect-ratio: 1/1;
+}
+.account__border-img {
+  width: 70%;
+  height: 50%;
+}
+
+.account__border-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+.account__border-title-wrapper .account__border-title {
+  margin-bottom: 0;
+}
+.account__border-button {
+  padding: 10px 20px;
+}
+.account__border-content {
+  width: 100%;
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  color: var(--c-gray);
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.account__border-box {
+  min-height: 310px;
+  margin-bottom: 40px;
+}
+
+.vacancies__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 43px 25px;
+}
+.vacancies__item {
+}
+.vacancies__link {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fz-l);
+}
+.vacancies__title {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.vacancies__text {
+  color: var(--c-gray);
+  padding: 15px 0;
+}
+.vacancies__price {
+  font-weight: 700;
+}
+.account__container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 100px;
+  grid-gap: 5%;
+}
+.account__box {
+  width: 50%;
+  min-height: 450px;
+}
+.link__list {
+  margin-bottom: 40px;
+}
+.link__item {
+  margin-bottom: 20px;
+}
+.link__item:last-child {
+  margin-bottom: 0;
+}
+.link__link {
+  font-size: var(--fz-l);
+  display: block;
+  padding: 10px 30px;
+  background-color: var(--c-cyan);
+  border-radius: 0.5rem;
+}
+.link__button {
+  width: 50%;
+  min-width: 250px;
+  text-align: center;
+  padding: 10px 30px;
+  margin: 0 auto;
+}
+.account__development {
+}
+
+.company__time {
+  color: var(--c-gray);
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.company__box-link {
+  margin-bottom: 30px;
+}
+
+.company__link {color: black;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  font-size: var(--fz-s);
+  margin-bottom: 10px;
+}
+
+.company__link:last-child {
+  margin-bottom: 0;
+}
+
+.company__link span {
+  color: var(--c-blue);
+}
+
+.company__link img {
+  width: 25px;
+  aspect-ratio: 1/1;
+  margin-right: 5px;
+}
+
+.account__border-box__resume {
+  height: 590px;
+}
+
+.popup__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--c-gray);
+  margin-bottom: 100px;
+  padding: 30px 0;
+}
+
+.popup {
+  margin: 0 auto;
+  border: 1px solid var(--c-gray);
+  padding: 40px 60px;
+  border-radius: 0.5rem;
+  background-color: var(--c-light);
+}
+
+.popup button {
+  display: block;
+  margin: 0 auto;
+}
+
+                                .main_content {
+
+    min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+   max-width:  1220px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+.container {max-width: 1200px;
+width: 100%;
+margin: 0 auto;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+    </style>
+</head>
+<body>
+
+<header style="border-bottom: 4px solid #0056b3; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+    <div class="container">
+    <div>
+        <style>  .no-select {
+        user-select: none; /* Запрет выделения текста */
+        -webkit-user-select: none; /* Для WebKit-браузеров */
+        -moz-user-select: none; /* Для Firefox */
+        -ms-user-select: none; /* Для старых IE */
+    } </style>
+        <a class="no-select" href="../" style="font-family: Arial, sans-serif; font-size: 24px; font-weight: 800; color: #0056b3; text-decoration: none;">
+            IT-Work<span style="color: #FD494C;">Ru</span>
+        </a>
+    </div>
+        {% if not user.is_authenticated %}
+    <div style="display: flex; gap: 20px; align-items: center;">
+
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Работодателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти сотрудника</a>
+                <a href="../page_vacancy">Разместить вакансию</a>
+                <a href="../register_employer">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Соискателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти работу</a>
+                <a href="../page_resume">Создать резюме</a>
+                <a href="../register_applicant">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+        {% else %}
+
+        {% if user.role == "applicant" %}
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти работу</a>
+        </div>
+                <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_resume" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Создать резюме</a>
+        </div>
+
+     </div>
+        {% else %}
+
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти сотрудника</a>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_vacancy" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Разместить вакансию</a>
+        </div>
+
+</div>
+
+
+
+
+
+        {% endif %}
+
+
+         {% endif %}
+        {% if user.is_authenticated %}
+        <div class="dropdown" id="dropdown-important" style="display: flex; flex-direction: row;">
+
+        <img style="width: 38px; border-radius: 50%;" src="{% static 'profile.png' %}" alt="profile">
+        <div style="margin-left: 15px; text-align: left;">
+
+
+            <span style="color: #2A3137; font-size: 18px; font-family: Arial; font-weight: 700; word-wrap: break-word; display: block;">
+                {{ user.first_name }} {{ user.last_name }}
+            </span>
+            <span style="color: #A1A1A1; font-size: 16px; font-family: Arial; font-weight: 400; word-wrap: break-word; display: block;">
+                {{ user.email }}
+            </span>
+
+
+        </div>
+
+        <img class="rotating-image_1"
+     style="cursor: pointer; margin-top: 10px; margin-left: 16px; width: 13px; height: 20px; transform: rotate(-180deg); transition: transform 0.3s ease;"
+     src="{% static 'Down.png' %}"
+     alt="Down" />
+                   <div class="dropdown-content" style="margin-top: -40px; min-width: 300px; top: 240%;">
+                        {% if user.role == "applicant" %}
+                        <a href="../featured_jobs" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;"><img style="width: 23px; border-radius: 80%; margin-left: -3px; margin-bottom: -4px; padding-right: 7px;" src="{% static 'love_vacancies.png' %}" alt="love_vacancies">Избранные вакансии (0)</a>
+                        <a href="../person_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../person_account#my_resumes" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Мои резюме (0)</a>
+                       <a href="../person_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../person_account/#employers_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики работодателей (0)</a>
+                        <a href="../page_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_person/#change_password_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../person_account/#current_balance_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_person_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../person_account?action=openPopup_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% else %}
+                        <a href="../company_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../company_account#my_vacancies" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Вакансии компании (0)</a>
+                        <a href="../company_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../company_account#applicants_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики соискателей (0)</a>
+                        <a href="../page_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_company#change_password_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../company_account#current_balance_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_company_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../company_account?action=openPopup_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% endif %}
+<a href="#" onclick="logout()" style="display: flex; align-items: center;">
+    <img style="width: 23px; border-radius: 80%;  margin-left: -3px; margin-top: -2px; padding-right: 7px;" src="{% static 'exit_image_1.png' %}" alt="exit_image">
+    <span style=" font-family: Arial, sans-serif; font-size: 16px;">Выйти</span>
+</a>
+
+
+            </div>
+
+        </div>
+        {% else %}
+        <a href="../login" class="login-btn" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Войти</a>
+        {% endif %}
+
+
+
+
+    </div></div>
+</header>
+<script>
+// Получаем контейнер по ID
+const dropdownContainer = document.getElementById('dropdown-important');
+
+// Получаем стрелку
+const rotatingImage = dropdownContainer.querySelector('.rotating-image_1');
+
+// Добавляем обработчики событий на весь контейнер
+dropdownContainer.addEventListener('mouseover', () => {
+    rotatingImage.style.transform = 'rotate(0deg)'; // Поворачиваем стрелку вверх
+});
+
+dropdownContainer.addEventListener('mouseout', () => {
+    rotatingImage.style.transform = 'rotate(-180deg)'; // Возвращаем стрелку вниз
+});
+
+
+
+    function logout() {
+        fetch('{% url "logout" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                // Если выход успешен, обновите интерфейс или перезагрузите страницу
+                location.reload();  // Перезагрузка страницы
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе:', error));
+    }
+</script>
+
+<div class="main_content">
+<style>.form__img-box {
+  position: relative;
+  display: inline-block;
+}
+
+.form__img-person{
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1.42;
+}
+
+.form__img {margin-top: 10px;
+  width: 100%;
+  height: auto;
+}
+
+.form__change-photo, .form__delete-photo { border-radius: 10px;
+  position: absolute;
+  bottom: 5px;
+  right: 15px;
+  width: 18%;
+  opacity: 0; /* Начально скрыто */
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.form__img-box:hover .form__change-photo, .form__img-box:hover .form__delete-photo{
+  opacity: 1; /* Показываем при наведении */
+  transform: translateY(-10px); /* Легкий эффект смещения */
+}
+
+    .form__change-photo:hover {
+  content: url("{% static 'change_photo_1.png' %}");
+}
+ .form__delete-photo:hover {
+  content: url("{% static 'delete_photo_1.png' %}");
+}
+</style>
+
+<!-- Форма для изменения изображения профиля -->
+<form method="POST" enctype="multipart/form-data" id="profile_image_form">
+{% csrf_token %}
+<!-- Скрытое поле для загрузки изображения -->
+<input type="file" id="id_profile_image" name="profile_image" style="display: none;" accept="image/*" onchange="this.form.submit();" />
+</form>
+
+<!-- Форма для удаления изображения профиля -->
+<form method="POST" id="profile_image_delete_form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="delete_image" />
+</form>
+
+   <h1 class="form__title">Редактировать данные профиля</h1>
+<div class="form__main">
+  <div class="form__aside">
+    <div class="form__img-box form__img-person">
+        {% if user.profile_image %}
+        <img class="form__img" src="{{ user.profile_image.url }}" alt="person" />
+        <img style="right: 76px;" class="form__change-photo" src="{% static 'change_photo.png' %}" alt="change_photo" onclick="document.getElementById('id_profile_image').click();" />
+        <img class="form__delete-photo" src="{% static 'delete_photo.png' %}" alt="delete_photo" onclick="document.getElementById('profile_image_delete_form').submit();" />
+      {% else %}
+        <img class="form__img" src="{% static 'person_1.jpg' %}" alt="person" />
+        <img class="form__change-photo" src="{% static 'change_photo.png' %}" alt="change_photo" onclick="document.getElementById('id_profile_image').click();" />
+      {% endif %}
+    </div>
+    <p class="form__img-text">
+      Вы можете загрузить фотографию <br> в формате JPG или PNG
+    </p>
+    <a href="../person_account"><button class="form__button-title btn">В личный кабинет</button></a>
+    <h2 class="form__subtitle">Статус на сайте</h2>
+    <form id="form__person" class="form__person" method="post">  {% csrf_token %}
+      <label class="form__status-label">
+        <input
+          class="form__status-input"
+          type="radio"
+          name="work_status"
+          value="S"
+          {% if user.work_status == "S" %} checked {% endif %}
+        />
+        Я в поиске работы
+        <div class="form__status-text">
+          Вы можете публиковать резюме и получать персонализированные <br> подборки
+          вакансий
+        </div>
+      </label>
+
+      <label class="form__status-label">
+        <input
+          class="form__status-input"
+          type="radio"
+          name="work_status"
+          value="N"
+          {% if user.work_status == "N" %} checked {% endif %}
+        />
+        Я не ищу работу
+        <div class="form__status-text">
+          Резюме скрыты от потенциальных работодателей
+        </div>
+      </label>
+
+  </div>
+
+  <div class="form__content">
+
+      <h2 class="form__content-title form__subtitle">Общая информация</h2>
+      <label class="form__person-label">
+        <span class="form__person-span">Имя</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="first_name"
+          id="firstName"
+          placeholder="Имя"
+          value="{{ user.first_name|default_if_none:'' }}"
+          required
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Фамилия</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="last_name"
+          id="lastName"
+          placeholder="Фамилия"
+          value="{{ user.last_name|default_if_none:'' }}"
+          required
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Отчество</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="middle_name"
+          id="patronymic"
+          placeholder="Отчество"
+          value="{{ user.middle_name|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Дата рождения</span>
+        <input
+          class="form__person-input"
+          type="date"
+          name="birth_date"
+          id="date"
+          placeholder="12.11.2000"
+          value="{{ user.birth_date|date:'Y-m-d'|default_if_none:'' }}"
+        />
+      </label>
+      <div class="form__person-label">
+        <span class="form__person-span required">Пол</span>
+
+        <div class="form__person-radio__box">
+          <label class="form__person-label__radio">
+            <input
+              class="form__person-radio"
+              type="radio"
+              name="gender"
+              value="M"
+              {% if user.gender == "M" %}checked {% endif %}
+            />
+            Мужской
+          </label>
+          <label class="form__person-label__radio">
+            <input
+              class="form__person-radio"
+              type="radio"
+              name="gender"
+              value="F"
+              {% if user.gender == "F" %} checked {% endif %}
+            />
+            Женский
+          </label>
+        </div>
+
+      </div>
+      <label class="form__person-label">
+        <span class="form__person-span">Гражданство</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="citizenship"
+          id="citizenship"
+          placeholder="Гражданство"
+      value="{{ user.citizenship|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Город</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="city"
+          id="city"
+          placeholder="Город"
+          value="{{ user.city|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Индекс</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="postal_code"
+          id="index"
+          placeholder="Индекс"
+          value="{{ user.postal_code|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Адрес</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="address"
+          id="address"
+          placeholder="ул. Гагарина, 15а"
+          value="{{ user.address|default_if_none:'' }}"
+        />
+          <div style="font-size: 14px; padding-top: 3.5px;" class="form__status-text">Не является обязательным для заполнения полем. Информация об адресе предоставляется исключительно с согласия соискателя, не отображается в резюме, недоступна работодателям и третьим лицам, позволяет предлагать вакансии вблизи вашего места жительства.</div>
+      </label>
+
+      <h2 class="form__content-title form__subtitle" style="margin-top: 35px;">Контактные данные</h2>
+         <label class="form__person-label">
+        <span class="form__person-span" >E-mail</span>
+        <input style="background-color: #f0f0f0; outline: none;"
+          class="form__person-input"
+          type="email"
+          name="email"
+          id="email"
+          placeholder="Например, email@example.com"
+          required
+          value="{{ user.email|default_if_none:'' }}"
+          readonly
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Телефон</span>
+        <input
+          class="form__person-input"
+          type="tel"
+          name="phone"
+          id="telephone"
+          placeholder="Например, +7 (XXX) XXX-XX-XX"
+          required
+          value="{{ user.phone|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label form__person-label__checkbox">
+        <input
+          class="form__person-checkbox"
+          type="checkbox"
+          name="telephone_show"
+          {% if user.telephone_show %}
+            checked
+          {% endif %}
+        />
+        Отображать номер телефона в резюме
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Вконтакте</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="vk_link"
+          id="vk"
+          placeholder="Вконтакте"
+          value="{{ user.vk_link|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Одноклассники</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="ok_link"
+          id="ok"
+          placeholder="Одноклассники"
+          value="{{ user.ok_link|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Telegram</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="telegram_link"
+          id="tg"
+          placeholder="Telegram"
+          value="{{ user.telegram_link|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">WhatsApp</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="whatsapp_link"
+          id=""
+          placeholder="WhatsApp"
+          value="{{ user.whatsapp_link|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label">
+        <span class="form__person-span">Skype</span>
+        <input
+          class="form__person-input"
+          type="text"
+          name="skype_link"
+          id="sk"
+          placeholder="Skype"
+          value="{{ user.skype_link|default_if_none:'' }}"
+        />
+      </label>
+      <label class="form__person-label form__person-label__checkbox">
+        <input
+          class="form__person-checkbox"
+          type="checkbox"
+          name="social_network_show"
+          {% if user.social_network_show %}
+            checked
+          {% endif %}
+        />
+        Отображать ссылки на профили социальных сетей в резюме
+      </label>
+
+
+
+
+
+
+      <button style="width: 101.85%;" class="form__button btn" type="submit" name="action" value="save_changes">
+        Сохранить изменения
+      </button>
+    </form>
+
+      <div class="form__button btn" style="margin-top: 19px; width: 98.65%;" onclick="togglePasswordForm()" id="change_password_applicant">
+        Изменить пароль
+      </div>
+<style>
+#change_password_applicant_1, #change_password_applicant_2, #change_password_applicant_3 {
+    display: none;
+    transition: all 0.3s ease-in-out;
+}
+ </style>
+<h2 class="form__content-title form__subtitle" id="change_password_applicant_1">Изменить пароль</h2>
+<form method="post" style="display: none;" id="change_password_applicant_2">
+    {% csrf_token %}
+    <label class="form__person-label">
+        <span class="form__person-span">Пароль</span>
+        <input
+            class="form__person-input"
+            type="password"
+            name="old_password"
+            id="old_password"
+            placeholder="Пароль"
+        />
+    </label>
+    <label class="form__person-label">
+        <span class="form__person-span">Новый пароль</span>
+        <input
+            class="form__person-input"
+            type="password"
+            name="new_password1"
+            id="new_password1"
+            placeholder="Новый пароль"
+        />
+    </label>
+    <label class="form__person-label">
+        <span class="form__person-span">Повторите пароль</span>
+        <input
+            class="form__person-input"
+            type="password"
+            name="new_password2"
+            id="new_password2"
+            placeholder="Повторите пароль"
+        />
+    </label>
+    <button class="form__password-button btn" type="submit" name="action" value="change_password">
+        Изменить пароль
+    </button>
+</form>
+
+      <a id="change_password_applicant_3" class="form__link-delete" href="#" onclick="deleteAccount()">Удалить аккаунт</a>
+
+<script>
+
+    function togglePasswordForm() {
+    var change_password_applicant_1 = document.getElementById("change_password_applicant_1");
+    var change_password_applicant_2 = document.getElementById("change_password_applicant_2");
+    var change_password_applicant_3 = document.getElementById("change_password_applicant_3");
+    var imgBoxes = document.querySelectorAll(".form__img-box");
+    if (change_password_applicant_2.style.display === "none") {
+        change_password_applicant_1.style.display = "block";
+        change_password_applicant_2.style.display = "block";
+        change_password_applicant_3.style.display = "block";
+        imgBoxes.forEach(function (box) {
+            box.style.height = "14.7%";
+        });
+        // Прокрутка к элементу change_password_applicant_3
+        change_password_applicant_3.scrollIntoView({ behavior: "smooth" });
+    } else {
+        change_password_applicant_1.style.display = "none";
+        change_password_applicant_2.style.display = "none";
+        change_password_applicant_3.style.display = "none";
+        imgBoxes.forEach(function (box) {
+            box.style.height = "18.7%";
+        });
+    }
+}
+
+
+function deleteAccount() {
+    if (confirm("Вы уверены, что хотите удалить свой аккаунт?")) {
+        fetch("{% url 'delete_account' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({})  // Можно передавать дополнительные данные, если нужно
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("Ваш аккаунт был удален.");
+                window.location.href = "/";  // Перенаправляем на главную страницу
+            } else {
+                alert("Произошла ошибка при удалении аккаунта.");
+            }
+        })
+        .catch(error => {
+            alert("Ошибка при выполнении запроса.");
+        });
+    }
+}
+
+
+
+</script>
+
+
+<style>
+  /* Стили для попапа */
+  .popup__wrapper {
+    display: none; /* Скрываем попап по умолчанию */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    opacity: 0; /* Начальная прозрачность */
+    transition: opacity 0.5s ease; /* Плавный эффект появления */
+  }
+
+  .popup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+  }
+</style>
+
+{% if messages %}
+  <div class="popup__wrapper" id="popupWrapper_person">
+    <div class="popup">
+      {% for message in messages %}
+          <p id="popupMessage">{{ message }}</p>
+      {% endfor %}
+    </div>
+  </div>
+  <script>
+    const popup = document.getElementById('popupWrapper_person');
+    if (popup) {
+      popup.style.display = 'flex';
+      setTimeout(() => {
+        popup.style.opacity = '1';
+      }, 10);
+
+      setTimeout(() => {
+        popup.style.opacity = '0';
+        setTimeout(() => {
+          popup.style.display = 'none';
+        }, 500);
+      }, 2000);
+    }
+  </script>
+{% endif %}
+
+
+
+
+
+  </div>
+</div>
+
+</div>
+
+
+
+
+<footer>
+    &copy; 2024 IT-WorkRu. Все права защищены.
+</footer>
+
+
+
+</body>
+</html>

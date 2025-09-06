@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+
+:root {
+  --c-black: #000000;
+  --c-dark: #202020;
+  --c-white: #ffffff;
+  --c-light: #eeeeee;
+  --c-gray: #bbbbbb;
+  --c-cyan: #afc4e4;
+  --c-blue: #337ce9;
+  --c-red: #f66766;
+
+  --fz-s: 14px;
+  --fz-m: 16px;
+  --fz-l: 18px;
+  --fz-xl: 24px;
+  --fz-xxl: 36px;
+}
+
+.btn {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-blue);
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+.btn-reverse {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+.btn-reverse:hover {
+  background-color: var(--c-blue);
+  color: var(--c-white);
+}
+
+.form__title {
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+  margin: 45px 0 30px;
+}
+.form__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+.form__aside {
+  width: 25%;
+}
+.form__content {
+  width: 75;
+}
+
+.form__img-box {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.form__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.form__person-img__box {
+  aspect-ratio: 4/1;
+  margin-top: 10px;
+}
+
+.form__img-text {
+  font-size: var(--fz-s);
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+.form__button-title {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+.form__subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status {
+}
+.form__status-label {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status-input {
+}
+.form__status-text {
+  font-size: var(--fz-s);
+  color: var(--c-gray);
+  margin-top: 5px;
+}
+
+.form__person {
+}
+.form__content-title {
+  margin-top: 45px;
+}
+.form__content-title:first-child {
+  margin-top: 0px;
+}
+.form__person-label {
+  display: block;
+  margin-bottom: 15px;
+}
+.form__person-span {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.form__person-label:has(.form__person-input:required) .form__person-span::after,
+.required::after {
+  content: " *";
+  font-size: 1.3em;
+  color: var(--c-red);
+  margin-bottom: 15px;
+}
+
+.form__person-input {
+  width: 100%;
+  padding: 10px;
+  font-size: var(--fz-m);
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  background-color: #fff;
+}
+
+.form__person-radio__box {
+  display: flex;
+  grid-gap: 45px;
+}
+.form__person-label__radio {
+  display: block;
+  font-weight: 500;
+}
+.form__person-radio,
+.form__person-checkbox {
+  margin-right: 3px;
+}
+
+.form__person-label__checkbox {
+  font-weight: 700;
+}
+
+.form__password-button {
+  margin-bottom: 15px;
+  padding: 10px 30px;
+}
+.form__link-delete {
+  display: block;
+  color: var(--c-gray);
+  text-decoration: underline;
+  margin-bottom: 40px;
+}
+
+.form__button {
+  font-size: var(--fz-l);
+  width: 100%;
+  padding: 20px;
+}
+
+.form__aside-container {
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  padding: 25px 0;
+}
+
+.form__aside-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.form__aside-list {
+}
+
+.form__aside-item {
+  padding: 7px 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.form__aside-item:hover {
+  background-color: var(--c-light);
+}
+
+.form__aside-link {
+}
+
+.form__resume-box {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio {
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio:last-child {
+  margin-bottom: 0;
+}
+
+.form__button-content {
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.form__person-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form__person-box .form__status-input {
+  margin-right: 10px;
+}
+
+.form__person-box .form__status-label {
+  font-size: var(--fz-s);
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form__person-input__file {
+  display: none;
+}
+
+.form__person-input__file-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.form__person-input__file-img {
+  height: 27px;
+  aspect-ratio: 1/2;
+}
+
+.form__person-plus__box {
+  position: relative;
+}
+
+.form__person-plus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--c-blue);
+  height: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: var(--c-white);
+  border-radius: 0.5rem;
+}
+
+.form__person-span_mb {
+  margin-bottom: 15px;
+}
+
+.form__person-mtb {
+  margin: 30px 0;
+}
+
+/* account.component.html */
+
+.account__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 40px 0 30px;
+}
+
+.account__title-subtitle {
+  margin-right: auto;
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+}
+
+.account__title-text {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+}
+
+.account__title-button {
+  font-size: var(--fz-l);
+  padding: 10px 30px;
+}
+
+.account__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+
+.account__aside {
+  width: 20%;
+}
+.account__content {
+  width: 80%;
+}
+
+.account__name {
+  font-size: var(--fz-l);
+  font-weight: 700;
+  text-align: center;
+  margin: 10px 0;
+}
+.account__favourites {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fz-s);
+  margin-bottom: 20px;
+}
+.account__favourites-link {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.account__favourites-count {
+  border-radius: 100%;
+  background-color: var(--c-light);
+  padding: 0 5px;
+}
+.account__button-edit {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.account__border {
+  position: relative;
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  padding: 35px;
+  overflow: hidden;
+}
+.account__border-subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+.account__border-text {
+  margin-bottom: 25px;
+}
+.account__border-link__span {
+  display: block;
+  margin-bottom: 35px;
+}
+.account__border-link__span span {
+  color: var(--c-blue);
+}
+.account__border-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-item {
+  width: 23%;
+}
+.account__border-link {
+  width: 100%;
+  aspect-ratio: 1/1;
+}
+.account__border-img {
+  width: 100%;
+  height: 100%;
+}
+
+.account__border-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+.account__border-title-wrapper .account__border-title {
+  margin-bottom: 0;
+}
+.account__border-button {
+  padding: 10px 20px;
+}
+.account__border-content {
+  width: 100%;
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  color: var(--c-gray);
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.account__border-box {
+  min-height: 310px;
+  margin-bottom: 40px;
+}
+
+.vacancies__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 43px 25px;
+}
+.vacancies__item {
+}
+.vacancies__link {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fz-l);
+}
+.vacancies__title {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.vacancies__text {
+  color: var(--c-gray);
+  padding: 15px 0;
+}
+.vacancies__price {
+  font-weight: 700;
+}
+.account__container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 100px;
+  grid-gap: 5%;
+}
+.account__box {
+  width: 50%;
+  min-height: 450px;
+}
+.link__list {
+  margin-bottom: 40px;
+}
+.link__item {
+  margin-bottom: 20px;
+}
+.link__item:last-child {
+  margin-bottom: 0;
+}
+.link__link {
+  font-size: var(--fz-l);
+  display: block;
+  padding: 10px 30px;
+  background-color: var(--c-cyan);
+  border-radius: 0.5rem;
+}
+.link__button {
+  width: 50%;
+  min-width: 250px;
+  text-align: center;
+  padding: 10px 30px;
+  margin: 0 auto;
+}
+.account__development {
+}
+
+.company__time {
+  color: var(--c-gray);
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.company__box-link {
+  margin-bottom: 30px;
+}
+
+.company__link {
+  display: flex;
+  align-items: center;
+  font-size: var(--fz-s);
+  margin-bottom: 10px;
+}
+
+.company__link:last-child {
+  margin-bottom: 0;
+}
+
+.company__link span {
+  color: var(--c-blue);
+}
+
+.company__link img {
+  width: 25px;
+  aspect-ratio: 1/1;
+  margin-right: 5px;
+}
+
+.account__border-box__resume {
+  height: 590px;
+}
+
+.popup__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--c-gray);
+  margin-bottom: 100px;
+  padding: 30px 0;
+}
+
+.popup {
+  margin: 0 auto;
+  border: 1px solid var(--c-gray);
+  padding: 40px 60px;
+  border-radius: 0.5rem;
+  background-color: var(--c-light);
+}
+
+.popup button {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Эти 2 класса для демонстрации, просто удали */
+.filter__container,
+.registration__container {
+  width: 100%;
+  margin: 50px auto;
+}
+
+.registration__inner {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.registration__label {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.form__status-link {
+  color: var(--c-blue);
+  transition: all 0.3s ease-in-out;
+}
+.form__status-link:hover {
+  color: var(--c-red);
+}
+
+.registration__link {
+  display: block;
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--c-blue);
+  font-weight: 700;
+}
+
+.filter__inner {
+  width: 25%;
+  margin: 0 auto;
+}
+.filter__inner .account__border {
+  padding: 20px;
+}
+
+.filter__form-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter__form-content {
+  font-size: var(--fz-s);
+}
+
+.filter__button {
+  margin-bottom: 0;
+}
+
+  </style>
+</head>
+<body>
+  <div class="filter__container">
+    <div class="filter__inner">
+      <div class="account__border">
+        <form id="form__person" class="form__person" action="">
+          <label class="form__person-label">
+            <span class="form__person-span">Уровень компетенций</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="competence"
+              id="competence"
+              placeholder="Выбрать"
+            />
+          </label>
+          <div class="form__person-label">
+            <span class="form__person-span">Желаемый уровень дохода</span>
+            <div class="form__resume-box">
+              <input
+                class="form__person-input"
+                type="number"
+                name="from"
+                id="from"
+                placeholder="От"
+              />
+              <input
+                class="form__person-input"
+                type="number"
+                name="to"
+                id="to"
+                placeholder="До"
+              />
+            </div>
+          </div>
+          <label class="form__person-label">
+            <span class="form__person-span">Валюта</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="currency"
+              id="currency"
+              placeholder="P"
+            />
+          </label>
+          <label class="form__person-label form__person-label__checkbox">
+            <div class="filter__form-box">
+              <input
+                class="form__person-checkbox"
+                type="checkbox"
+                name="telephoneShow"
+                value="1"
+              />
+              <div class="filter__form-content">
+                Показать только вакансии с указанием уровня дохода
+              </div>
+            </div>
+          </label>
+          <label class="form__person-label">
+            <span class="form__person-span">График работы</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="timeTable"
+              id="timeTable"
+              placeholder="Выбрать"
+            />
+          </label>
+          <label class="form__person-label">
+            <span class="form__person-span">Тип занятости</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="employ"
+              id="employ"
+              placeholder="Выбрать"
+            />
+          </label>
+          <div class="form__person-label">
+            <span class="form__person-span form__person-span_mb"
+              >Опыт работы</span
+            >
+            <div class="form__person-radio__box-col">
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="0"
+                />
+                Есть опыт
+              </label>
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="1"
+                />
+                От 1 до 3 лет
+              </label>
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="2"
+                />
+                От 3 до 6 лет
+              </label>
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="3"
+                />
+                Более 6
+              </label>
+            </div>
+          </div>
+          <label class="form__person-label">
+            <span class="form__person-span">Ключевые навыки</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="skills"
+              id="skills"
+              placeholder="Выбрать"
+            />
+          </label>
+          <button class="form__button-title btn">Показать</button>
+          <button class="form__button-title btn btn-reverse filter__button">
+            Сбросить фильтры
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>

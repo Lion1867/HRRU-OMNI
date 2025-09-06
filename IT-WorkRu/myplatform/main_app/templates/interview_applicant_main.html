@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>IT-WorkRu - интеллектуальная платформа для поиска вакансий и образовательных ресурсов</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <style>
+
+        html, body {
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Растягиваем шапку на всю ширину */
+            box-sizing: border-box;
+        }
+        header a {
+            text-decoration: none;
+            color: #000;
+            margin-right: 35px;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #0056b3;
+        }
+        .login-btn {
+            font-weight: bold;
+            background-color: #0056b3;
+            color: #fff;
+            padding: 10px 23px;
+            border-radius: 12px;
+            text-decoration: none;
+        }
+        .login-btn:hover {
+            background-color: #003f8c;
+            color: white;
+        }
+        .main-content {
+            position: relative;
+            text-align: center;
+            min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+            padding: 20px;
+        }
+        .main-content h1 {
+            font-size: 32px;
+            color: #333;
+        }
+        .main-content p {
+            font-size: 18px;
+            color: #333;
+        }
+        .search-box {
+            margin-top: 45px;
+            display: flex;
+            align-items: center;
+            border: 2px solid #DCDCDC; /* Граница для всего блока */
+            border-radius: 5px; /* Скругление углов всего блока */
+
+        }
+
+        .search-box input[type="text"] {
+            padding-top: 17.5px; padding-bottom: 17.5px; padding-left: 23px;
+            width: 400px; /* Увеличение ширины */
+            font-size: 16px;
+            border: none; /* Убираем границу у input */
+            flex-grow: 1; /* Дает input занимать доступное пространство */
+        }
+
+        .search-box button {
+            padding: 19px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #003f8c;
+        }
+        .search-box input[type="text"]:focus {
+        outline: none; /* Добавляем свою рамку при фокусе */
+        }
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+/* Для контейнера выпадающего списка */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Скрытый контент выпадающего списка */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    top: 240%; /* Используем позиционирование для отображения списка */
+    text-align: left;
+}
+
+/* Псевдоэлемент для создания буферной зоны */
+.dropdown::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 46px; /* Высота буферной зоны */
+    background: transparent;
+    z-index: 0;
+}
+
+/* Показываем выпадающий список при наведении */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Оформление ссылок внутри выпадающего списка */
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px; /* Добавляем отступы внутри элементов */
+    width: 100%; /* Ссылка занимает всю ширину */
+    box-sizing: border-box; /* Включаем отступы и границы в размеры элемента */
+    color: black;
+    text-decoration: none;
+}
+
+/* При наведении на ссылку изменяется цвет фона по всей ширине */
+.dropdown-content a:hover {
+    background-color: #f0f0f0; /* Более светлый цвет фона */
+    border: none; /* Убираем границы */
+    color: #0056b3; /* Изменяем цвет текста */
+}
+
+/* Стили для изображений в левом верхнем и правом нижнем углах */
+.main-content img:first-of-type {
+    position: absolute;
+    top: -20px;
+    left: 0px;
+    width: 280px; /* Настройте размер изображения по необходимости */
+    height: auto;
+}
+.main-content img:last-of-type {
+    position: absolute;
+    bottom: 140px;
+    right: 0px;
+    width: 550px; /* Настройте размер изображения по необходимости */
+    height: auto;
+}
+           .container {max-width: 1200px;
+width: 100%;
+margin: 0 auto;
+
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+    </style>
+</head>
+<body>
+
+<header style="border-bottom: 4px solid #0056b3; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+    <div class="container">
+    <div>
+        <style>  .no-select {
+        user-select: none; /* Запрет выделения текста */
+        -webkit-user-select: none; /* Для WebKit-браузеров */
+        -moz-user-select: none; /* Для Firefox */
+        -ms-user-select: none; /* Для старых IE */
+    } </style>
+        <a class="no-select" href="../" style="font-family: Arial, sans-serif; font-size: 24px; font-weight: 800; color: #0056b3; text-decoration: none;">
+            IT-Work<span style="color: #FD494C;">Ru</span>
+        </a>
+    </div>
+        {% if not user.is_authenticated %}
+    <div style="display: flex; gap: 20px; align-items: center;">
+
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Работодателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти сотрудника</a>
+                <a href="../page_vacancy">Разместить вакансию</a>
+                <a href="../register_employer">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Соискателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти работу</a>
+                <a href="../page_resume">Создать резюме</a>
+                <a href="../register_applicant">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+        {% else %}
+
+        {% if user.role == "applicant" %}
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти работу</a>
+        </div>
+                <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_resume" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Создать резюме</a>
+        </div>
+
+     </div>
+        {% else %}
+
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти сотрудника</a>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_vacancy" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Разместить вакансию</a>
+        </div>
+
+</div>
+
+
+
+
+
+        {% endif %}
+
+
+         {% endif %}
+        {% if user.is_authenticated %}
+        <div class="dropdown" id="dropdown-important" style="display: flex; flex-direction: row;">
+
+        <img style="width: 38px; border-radius: 50%;" src="{% static 'profile.png' %}" alt="profile">
+        <div style="margin-left: 15px; text-align: left;">
+
+
+            <span style="color: #2A3137; font-size: 18px; font-family: Arial; font-weight: 700; word-wrap: break-word; display: block;">
+                {{ user.first_name }} {{ user.last_name }}
+            </span>
+            <span style="color: #A1A1A1; font-size: 16px; font-family: Arial; font-weight: 400; word-wrap: break-word; display: block;">
+                {{ user.email }}
+            </span>
+
+
+        </div>
+
+        <img class="rotating-image_1"
+     style="cursor: pointer; margin-top: 10px; margin-left: 16px; width: 13px; height: 20px; transform: rotate(-180deg); transition: transform 0.3s ease;"
+     src="{% static 'Down.png' %}"
+     alt="Down" />
+                   <div class="dropdown-content" style="margin-top: -40px; min-width: 300px; top: 240%;">
+                        {% if user.role == "applicant" %}
+                        <a href="../featured_jobs" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;"><img style="width: 23px; border-radius: 80%; margin-left: -3px; margin-bottom: -4px; padding-right: 7px;" src="{% static 'love_vacancies.png' %}" alt="love_vacancies">Избранные вакансии (0)</a>
+                        <a href="../person_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../person_account#my_resumes" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Мои резюме (0)</a>
+                       <a href="../person_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../person_account/#employers_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики работодателей (0)</a>
+                        <a href="../page_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_person/#change_password_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../person_account/#current_balance_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_person_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../person_account?action=openPopup_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% else %}
+                        <a href="../company_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../company_account#my_vacancies" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Вакансии компании (0)</a>
+                        <a href="../company_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../company_account#applicants_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики соискателей (0)</a>
+                        <a href="../page_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_company#change_password_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../company_account#current_balance_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_company_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../company_account?action=openPopup_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% endif %}
+<a href="#" onclick="logout()" style="display: flex; align-items: center;">
+    <img style="width: 23px; border-radius: 80%;  margin-left: -3px; margin-top: -2px; padding-right: 7px;" src="{% static 'exit_image_1.png' %}" alt="exit_image">
+    <span style=" font-family: Arial, sans-serif; font-size: 16px;">Выйти</span>
+</a>
+
+
+            </div>
+
+        </div>
+        {% else %}
+        <a href="../login" class="login-btn" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Войти</a>
+        {% endif %}
+
+
+
+
+    </div></div>
+</header>
+<script>
+// Получаем контейнер по ID
+const dropdownContainer = document.getElementById('dropdown-important');
+
+// Получаем стрелку
+const rotatingImage = dropdownContainer.querySelector('.rotating-image_1');
+
+// Добавляем обработчики событий на весь контейнер
+dropdownContainer.addEventListener('mouseover', () => {
+    rotatingImage.style.transform = 'rotate(0deg)'; // Поворачиваем стрелку вверх
+});
+
+dropdownContainer.addEventListener('mouseout', () => {
+    rotatingImage.style.transform = 'rotate(-180deg)'; // Возвращаем стрелку вниз
+});
+
+
+
+    function logout() {
+        fetch('{% url "logout" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                // Если выход успешен, обновите интерфейс или перезагрузите страницу
+                location.reload();  // Перезагрузка страницы
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе:', error));
+    }
+</script>
+
+<style>
+
+    :root {
+	--c-black: #000000;
+	--c-dark: #202020;
+	--c-white: #ffffff;
+	--c-light: #eeeeee;
+	--c-gray: #bbbbbb;
+	--c-cyan: #afc4e4;
+	--c-blue: #0056b3;
+	--c-red: #FD494C;
+
+	--fz-s: 14px;
+	--fz-m: 16px;
+	--fz-l: 18px;
+	--fz-xl: 24px;
+	--fz-xxl: 36px;
+}
+
+/* interview */
+
+button {
+	background-color: transparent;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+
+.interview {
+	background-color: rgba(19, 56, 108, 1);
+	padding: 87.5px 0 107.5px;
+	color: var(--c-white);
+	text-align: center;
+}
+
+.interview__title {
+	font-size: var(--fz-xxl);
+	font-weight: 700;
+	margin: 0 auto 50px;
+	text-align: center;
+}
+
+.interview__title-button {
+	background-color: var(--c-white);
+	padding: 0px 5px;
+	margin: 0 auto 15px;
+	border-radius: 0.5rem;
+	border-radius: 3px solid rgba(29, 85, 166, 1);
+}
+
+.interview__wrapper {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+.interview__box {
+	max-width: 500px;
+	background: rgb(29, 85, 166);
+	background: linear-gradient(
+		45deg,
+		rgba(29, 85, 166, 0.14) 0%,
+		rgba(29, 85, 166, 0.29) 50%,
+		rgba(29, 85, 166, 0.5) 100%
+	);
+	border-radius: 1rem;
+	box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
+}
+.interview__image-box {
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	overflow: hidden;
+	border-radius: 1rem 1rem 0 0;
+	border: 1px solid var(--c-white);
+}
+.interview__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center center;
+}
+.interview__name {
+	font-size: var(--fz-xl);
+	font-weight: 900;
+	margin: 20px auto 5px;
+}
+.interview__status {
+	font-size: var(--fz-s);
+	color: rgba(215, 215, 215, 1);
+	margin-bottom: 25px;
+}
+.interview__items {
+}
+.interview__item {
+	margin-bottom: 20px;
+}
+.interview__item-button {
+	color: var(--c-white);
+	font-size: var(--fz-m);
+	font-weight: 900;
+	background-color: rgba(29, 85, 166, 1);
+	width: 85%;
+	padding: 12px;
+	border-radius: 0.75rem;
+}
+.interview__repeat {
+	font-weight: 700;
+	font-size: var(--fz-s);
+	display: block;
+	background-color: var(--c-white);
+	padding: 5px 15px;
+	margin: 0 auto 15px;
+	border-radius: 0.5rem;
+	border-radius: 3px solid rgba(29, 85, 166, 1);
+}
+.interview__text {
+	font-weight: 700;
+	font-size: var(--fz-s);
+	color: rgba(215, 215, 215, 1);
+}
+
+.interview__content {
+	padding: 30px;
+}
+.interview__svg-box {
+	display: flex;
+	justify-content: space-between;
+}
+.interview__svg {
+}
+.interview__microphone-box {
+	max-width: 250px;
+	aspect-ratio: 1 / 1;
+	margin: 0 auto 10px;
+	background-color: #0b2140;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 100%;
+}
+.interview__microphone-button {
+	display: inline-block;
+	position: relative;
+	width: 80%;
+	aspect-ratio: 1 / 1;
+	border-radius: 100%;
+	background: rgb(29, 85, 166);
+	background: linear-gradient(
+		30deg,
+		rgba(29, 85, 166, 1) 0%,
+		rgba(138, 79, 122, 1) 50%,
+		rgba(253, 73, 76, 1) 100%
+	);
+}
+.interview__microphone-button::before {
+	content: '';
+	width: 125%;
+	aspect-ratio: 1 / 1;
+	background-color: rgba(29, 85, 166, 0.32);
+	border-radius: 100%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.interview__microphone-button::after {
+	content: '';
+	width: 112.5%;
+	aspect-ratio: 1 / 1;
+	background-color: rgba(138, 79, 122, 0.32);
+	border-radius: 100%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border: 1px solid #8a4f7a;
+}
+.interview__microphone-image {
+	position: absolute;
+	z-index: 100;
+	display: block;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-image: url("{% static 'microphon.svg' %}");
+	width: 97px;
+	height: 119.5px;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.blue {
+	color: var(--c-blue);
+}
+.red {
+	color: var(--c-red);
+}
+
+                   .main_content {
+
+    min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+   max-width:  1220px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+</style>
+                   <style>
+    .interview__status {
+        font-size: var(--fz-s);
+        color: #d7d7d7;
+        display: flex;
+        flex-direction: row; /* В ОДНУ СТРОКУ */
+        align-items: center; /* Центрируем по высоте */
+        justify-content: center; /* Центрируем по горизонтали */
+        gap: 0.5rem; /* Расстояние между анимацией и текстом */
+    }
+
+    .speaking-indicator {
+        display: flex;
+        align-items: center; /* Центрируем по вертикали */
+        gap: 4px;
+        height: 15px; /* Зафиксируем высоту контейнера */
+    }
+
+    .speaking-indicator span {
+        display: block;
+        width: 4px;
+        height: 6px;
+        background-color: var(--c-white);
+        border-radius: 10rem;
+        transform-origin: bottom; /* Зафиксируем точку вращения внизу */
+    }
+
+    /* Анимация "говорит" */
+    @keyframes speaking {
+        0%, 100% {
+            height: 6px;
+            /* Минимальная высота */
+        }
+        50% {
+            height: 15px;
+            /* Максимальная высота */
+        }
+    }
+
+    /* Применяем анимацию к элементам */
+    .speaking-indicator span {
+        animation: speaking 0.7s infinite ease-in-out;
+    }
+
+    .speaking-indicator.speaking span:nth-child(1) {
+        animation-delay: 0s;
+    }
+    .speaking-indicator.speaking span:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+    .speaking-indicator.speaking span:nth-child(3) {
+        animation-delay: 0.2s;
+    }
+
+    /* Анимация "думает" */
+    @keyframes thinking {
+        0%, 100% { opacity: 0.2; transform: scaleY(0.8); }
+        50% { opacity: 1; transform: scaleY(1.2); }
+    }
+
+    .speaking-indicator.thinking span {
+        animation: thinking 1.5s infinite ease-in-out;
+    }
+
+    .speaking-indicator.thinking span:nth-child(1) {
+        animation-delay: 0s;
+    }
+    .speaking-indicator.thinking span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    .speaking-indicator.thinking span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    .speaking-text {
+        white-space: nowrap; /* Чтобы текст не переносился */
+        display: inline-block; /* Блок по строке */
+        font-weight: bold;
+        margin-left: 8px; /* Расстояние между анимацией и текстом */
+    }
+
+    .speaking-indicator.thinking + .speaking-text {
+
+    }
+
+                       .speaking-indicator {
+  display: none; /* По умолчанию скрыто */
+}
+
+.speaking-indicator.speaking,
+.speaking-indicator.thinking {
+  display: flex; /* Показывается только при активных состояниях */
+}
+</style>
+
+
+
+
+
+
+
+
+<style>
+  /* Стили для попапа */
+  .popup__wrapper {display: flex;
+    z-index: 999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    opacity: 0; /* Начальная прозрачность */
+    transition: opacity 0.5s ease; /* Плавный эффект появления */
+  }
+
+  .popup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+
+.form__password-button {
+  margin-bottom: 15px;
+  padding: 10px 30px;
+}
+
+.btn {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-blue);
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+</style>
+
+<div class="interview">
+  <div class="container_1">
+    <h1 class="interview__title">
+      Собеседование с
+      <span class="interview__title-button"
+        ><span class="blue">AI</span><span class="red">Ru</span></span
+      >
+      на позицию | {{ vacancy.title }}
+
+    </h1>
+    <div class="interview__wrapper">
+      <div class="interview__box">
+
+<!-- Отображаем одно видео (для первого вопроса) -->
+<div class="interview__image-box">
+  {% if questions %}
+    <div class="video-wrapper">
+      <video id="currentVideo" class="interview__video" width="100%" controls poster="{% static 'default_speaker_start.png' %}">
+        <source src="{{ questions.0.video.url }}" type="video/webm">
+        Ваш браузер не поддерживает элемент video.
+      </video>
+    </div>
+  {% endif %}
+</div>
+
+        <div class="interview__name">
+            {% if interview.hr_name %}
+    {{ interview.hr_name }}
+{% elif interview.gender == 'МУЖ' %}
+    Дмитрий
+{% elif interview.gender == 'ЖЕН' %}
+    Анастасия
+{% endif %}
+        </div>
+        <!--<div class="interview__status">говорит</div>-->
+
+          									<div class="interview__status">
+  <div class="speaking-indicator">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="speaking-text">говорит</div>
+</div>
+
+
+        <div class="interview__items">
+          <!--<div class="interview__item">
+            <button class="interview__item-button">
+              Здравствуйте, как вас зовут?
+            </button>
+          </div>
+          <div class="interview__item">
+            <button class="interview__item-button">
+              Рада приветствовать Вас на
+            </button>
+          </div>
+          <div class="interview__item">
+            <button class="interview__item-button">
+              собеседовании! Расскажите о
+            </button>
+          </div>-->
+<div class="interview__items" id="interview-questions-runner">
+  <div class="interview__item-line interview__item-line--1">
+    <button class="interview__item-button" id="runner-line-1"></button>
+  </div><br>
+  <div class="interview__item-line interview__item-line--2">
+    <button class="interview__item-button" id="runner-line-2"></button>
+  </div><br>
+  <div class="interview__item-line interview__item-line--3">
+    <button class="interview__item-button" id="runner-line-3"></button>
+  </div>
+</div>
+
+{% if questions.exists %}
+<script>
+  const fullText = `{{ questions.0.text|escapejs }}`;
+</script>
+{% endif %}
+
+<!--<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (typeof fullText === 'undefined' || !fullText.trim()) return;
+
+  const lines = splitTextIntoLines(fullText, 6);
+  const lineElements = [
+    document.getElementById("runner-line-1"),
+    document.getElementById("runner-line-2"),
+    document.getElementById("runner-line-3")
+  ];
+
+  let currentIndex = 0;
+  const delay = 4500; // Интервал между сменой кадров
+  let isCarouselRunning = true; // Флаг для контроля анимации
+
+  function updateLines() {
+    if (!isCarouselRunning) return; // Если остановлено — выходим
+
+    for (let i = 0; i < lineElements.length; i++) {
+      const index = (currentIndex + i) % lines.length;
+      lineElements[i].textContent = lines[index] || "";
+    }
+
+    currentIndex = (currentIndex + 1) % lines.length;
+    setTimeout(updateLines, delay);
+  }
+
+  updateLines(); // Запускаем анимацию
+
+  // ==== Новый код: останавливаем карусель при окончании видео ====
+  const videoPlayer = document.getElementById("currentVideo");
+
+  if (videoPlayer) {
+    videoPlayer.addEventListener("ended", () => {
+      console.log("Видео закончилось — останавливаем карусель");
+      isCarouselRunning = false; // Останавливаем анимацию
+    });
+  }
+});
+
+function splitTextIntoLines(text, maxLines = 6) {
+  const words = text.trim().split(/\s+/);
+  const chunkSize = Math.ceil(words.length / maxLines);
+  const result = [];
+
+  for (let i = 0; i < words.length; i += chunkSize) {
+    result.push(words.slice(i, i + chunkSize).join(" "));
+  }
+
+  while (result.length < maxLines) result.push("");
+
+  return result;
+}
+</script>-->
+<script>
+  const lineElements = [
+    document.getElementById("runner-line-1"),
+    document.getElementById("runner-line-2"),
+    document.getElementById("runner-line-3")
+  ];
+
+  const delay = 4500;
+  let isCarouselRunning = true;
+  let currentQuestion = "";
+  let carouselTimeoutId = null;
+
+  // ==== Функция для разбивки текста на строки ====
+  function splitTextIntoLines(text, maxLines = 6) {
+    const words = text.trim().split(/\s+/);
+    if (!words.length) return [];
+
+    const chunkSize = Math.ceil(words.length / maxLines);
+    const result = [];
+    for (let i = 0; i < words.length; i += chunkSize) {
+      result.push(words.slice(i, i + chunkSize).join(" "));
+    }
+
+    return result;
+  }
+
+  // ==== Обновление карусели ====
+  function updateCarousel(questionText, useMaxLines = 6) {
+    // Если нет данных — выходим
+    if (!questionText || questionText === "Нет активных вопросов") {
+      clearCarousel();
+      return;
+    }
+
+    const lines = splitTextIntoLines(questionText, useMaxLines);
+
+    for (let i = 0; i < lineElements.length; i++) {
+      lineElements[i].textContent = lines[i] || "";
+    }
+
+    animateCarousel(lines);
+  }
+
+  // ==== Анимация карусели ====
+  function animateCarousel(lines) {
+    if (carouselTimeoutId) clearTimeout(carouselTimeoutId);
+
+    let index = 0;
+
+    function nextLine() {
+      for (let i = 0; i < lineElements.length; i++) {
+        const pos = (index + i) % lines.length;
+        lineElements[i].textContent = lines[pos] || "";
+      }
+      index = (index + 1) % lines.length;
+
+      if (isCarouselRunning) {
+        carouselTimeoutId = setTimeout(nextLine, delay);
+      }
+    }
+
+    nextLine();
+  }
+
+  // ==== Очистка карусели ====
+  function clearCarousel() {
+    lineElements.forEach(el => el.textContent = "");
+    if (carouselTimeoutId) clearTimeout(carouselTimeoutId);
+  }
+
+  // ==== Получение текущего вопроса из FastAPI ====
+  async function fetchCurrentQuestion(sessionId) {
+    try {
+      const response = await fetch(`http://localhost:8101/current_question/${sessionId}`);
+      if (!response.ok) throw new Error("Ошибка получения данных");
+
+      const data = await response.json();
+      let question = data.question;
+
+        // === УДАЛЕНИЕ ВНЕШНИХ КАВЫЧЕК ===
+        if (question && (question.startsWith('«') && question.endsWith('»'))) {
+          question = question.slice(1, -1);
+        }
+
+      if (question === "Интервью завершено") {
+        isCarouselRunning = false;
+        return;
+      }
+
+      if (question === "Нет активных вопросов" || !question.trim()) {
+        if (typeof fullText !== 'undefined' && fullText.trim()) {
+          if (currentQuestion !== fullText) {
+            currentQuestion = fullText;
+            updateCarousel(fullText, 6); // Разбиваем на 6 строк
+          }
+        } else {
+          clearCarousel();
+        }
+        return;
+      }
+
+      if (question && question !== currentQuestion) {
+        currentQuestion = question;
+        updateCarousel(question, 3); // Вопросы от API — на 3 строки
+      }
+    } catch (error) {
+      console.error("❌ Не удалось получить вопрос:", error);
+    }
+  }
+
+  // ==== Периодический опрос API ====
+  async function pollCurrentQuestion(sessionId) {
+    while (isCarouselRunning) {
+      await fetchCurrentQuestion(sessionId);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+
+  // ==== Логика старта интервью ====
+  document.addEventListener('DOMContentLoaded', function () {
+    const startInterviewButton = document.getElementById("startInterviewButton");
+    const videoPlayer = document.getElementById("currentVideo");
+
+    // ====== СКРЫВАЕМ ТЕКСТ ДО НАЧАЛА ИНТЕРВЬЮ ======
+    // Очищаем карусель при загрузке страницы
+    clearCarousel();
+
+    // ====== КНОПКА "НАЧАТЬ ИНТЕРВЬЮ" ======
+    if (startInterviewButton) {
+      startInterviewButton.addEventListener("click", () => {
+        // После нажатия начинаем показывать первый вопрос из БД
+        if (typeof fullText !== 'undefined' && fullText.trim()) {
+          currentQuestion = fullText;
+          updateCarousel(fullText, 6); // Только теперь разбиваем на 6 строк
+        }
+      });
+    }
+
+    // ====== ЗАПУСК ОПРОСА API ПОСЛЕ СОЗДАНИЯ session_id ======
+    const checkSessionAndStartPolling = setInterval(() => {
+      const sessionId = localStorage.getItem("session_id");
+      if (sessionId) {
+        clearInterval(checkSessionAndStartPolling);
+        pollCurrentQuestion(sessionId); // Теперь опрашиваем API
+      }
+    }, 1000);
+  });
+</script>
+
+            <br><br>
+            <div class="interview__text">Создано при поддержке </div>
+               <img  style="width: 15%;  margin-top: 7px; " src="{% static 'logo_ecosystem.png' %}" alt="logo_ecosystem" />
+
+        </div>
+        <!--<button class="interview__repeat" style="margin-top: 50px;">
+          <span class="blue">Повторить</span> <span class="red"> вопрос </span>
+        </button>-->
+        <!--<button class="interview__text">Сменить спикера на Дмитрия</button>-->
+      </div>
+
+      <div class="interview__box">
+        <div class="interview__image-box">
+    <video id="video" class="interview__image" autoplay poster="{% static 'default_speaker_start.png' %}"></video>
+        </div>
+          <script>
+    // Получаем элемент video
+    const video = document.getElementById('video');
+
+    // Запрашиваем доступ к веб-камере
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+            video.srcObject = stream;
+        })
+        .catch(error => {
+            console.error("Ошибка доступа к камере:", error);
+        });
+</script>
+        <div class="interview__content">
+          <div class="interview__svg-box">
+  <button id="cameraButton">
+    <div class="icon-wrapper">
+      <img class="interview__svg" id="cameraIcon" src="{% static 'camera.svg' %}" alt="Camera" />
+    </div>
+  </button>
+  <button id="soundButton">
+    <div class="icon-wrapper">
+      <img class="interview__svg" id="soundIcon" src="{% static 'sound.svg' %}" alt="Sound" />
+    </div>
+  </button>
+</div>
+          <div class="interview__microphone-box">
+<!-- Кнопка микрофона для воспроизведения следующего вопроса -->
+<button id="microphoneButton" class="interview__microphone-button" style="cursor: pointer;">
+  <img src="{% static 'microphon.svg' %}" alt=""/>
+  <span class="interview__microphone-image"></span>
+</button>
+          </div>
+          <p class="interview__text">
+            Нажмите, когда <br />
+            закончите отвечать
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+    /* === Анимация мигания вокруг микрофона === */
+.microphone-blink {
+    position: absolute;
+    top: 71.31%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    width: 230px; /* чуть больше кнопки микрофона */
+    height: 230px;
+    border: 4px solid #900020;
+    border-radius: 50%;
+    animation: blink-ring 1.2s infinite ease-in-out;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes blink-ring {
+    0% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Получаем элемент .interview__microphone-box
+    const microphoneBox = document.querySelector(".interview__microphone-box");
+    const micButton = document.getElementById("microphoneButton");
+    const videoPlayer = document.getElementById("currentVideo");
+
+    let blinkElement = null;
+
+    // Функция: показать анимацию
+    function showMicrophoneBlink() {
+        if (!blinkElement) {
+            blinkElement = document.createElement("div");
+            blinkElement.classList.add("microphone-blink");
+            microphoneBox.appendChild(blinkElement);
+        }
+    }
+
+    // Функция: скрыть анимацию
+    function hideMicrophoneBlink() {
+        if (blinkElement) {
+            blinkElement.remove();
+            blinkElement = null;
+        }
+    }
+
+    // ==== Обработчик окончания видео ====
+    videoPlayer.addEventListener("ended", () => {
+        console.log("Видео закончилось — показываем анимацию...");
+        showMicrophoneBlink(); // Показываем мигание
+    });
+
+    // ==== Обработчик клика на микрофон ====
+    micButton.addEventListener("click", () => {
+        console.log("Микрофон нажат — убираем мигание...");
+        hideMicrophoneBlink(); // Скрываем анимацию
+    });
+});
+</script>
+<style>.icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10%; /* Смещаем линию немного влево */
+  width: 120%; /* Увеличиваем длину линии */
+  height: 3px; /* Толщина линии */
+  background-color: red;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  opacity: 0; /* По умолчанию скрыто */
+  transition: opacity 0.3s ease;
+}
+
+.icon-wrapper.crossed::after {
+  opacity: 1; /* Показываем перечеркивание */
+}</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const cameraButton = document.getElementById('cameraButton');
+  const soundButton = document.getElementById('soundButton');
+  const cameraIconWrapper = document.querySelector('#cameraIcon').closest('.icon-wrapper');
+  const soundIconWrapper = document.querySelector('#soundIcon').closest('.icon-wrapper');
+  const videoElement = document.getElementById('video');
+  const currentVideo = document.getElementById('currentVideo'); // Элемент видео, который мы будем контролировать
+
+  let isCameraOn = true; // Состояние камеры
+  let isSoundOn = true; // Состояние звука
+  let mediaStream = null; // Хранит текущий медиапоток
+
+  // Логика для кнопки камеры
+  cameraButton.addEventListener('click', async () => {
+    isCameraOn = !isCameraOn; // Переключаем состояние
+    cameraIconWrapper.classList.toggle('crossed', !isCameraOn); // Добавляем/убираем класс
+
+    if (isCameraOn) {
+      console.log('Камера включена');
+      startCamera(); // Включаем запись с камеры
+    } else {
+      console.log('Камера выключена');
+      stopAllMedia(); // Принудительно останавливаем все медиапотоки
+      videoElement.srcObject = null; // Отключаем поток от видеоэлемента
+    }
+  });
+
+  // Логика для кнопки звука
+  soundButton.addEventListener('click', async () => {
+    isSoundOn = !isSoundOn; // Переключаем состояние
+    soundIconWrapper.classList.toggle('crossed', !isSoundOn); // Добавляем/убираем класс
+
+    if (isSoundOn) {
+      console.log('Звук включен');
+      currentVideo.muted = false; // Включаем звук для видео
+    } else {
+      console.log('Звук выключен');
+      currentVideo.muted = true; // Выключаем звук для видео
+    }
+  });
+
+  // Функция для включения камеры
+  async function startCamera() {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      console.log('Запись с камеры начата');
+      videoElement.srcObject = mediaStream; // Подключаем видеопоток к элементу <video>
+    } catch (err) {
+      console.error('Ошибка доступа к камере:', err);
+    }
+  }
+
+  // Функция для включения звука
+  async function startAudio() {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Воспроизведение звука начато');
+      // Здесь можно добавить код для работы с аудиопотоком
+    } catch (err) {
+      console.error('Ошибка доступа к микрофону:', err);
+    }
+  }
+
+  // Функция для принудительной остановки всех медиапотоков
+  function stopAllMedia() {
+    if (mediaStream) {
+      const tracks = mediaStream.getTracks();
+      tracks.forEach(track => {
+        track.stop(); // Останавливаем каждый трек
+        console.log(`Трек ${track.kind} остановлен`);
+      });
+      mediaStream = null; // Очищаем ссылку на поток
+    }
+  }
+});
+</script>
+
+<!-- Попап для старта интервью -->
+<div class="popup__wrapper" id="popupWrapper_interview">
+  <div class="popup">
+    <h2>Начать собеседование</h2>
+            <b>Пожалуйста, не покидайте страницу собеседования до появления сообщения о его завершении,
+      иначе ваш прогресс не будет отправлен работодателю!</b><br><br>
+                  <p>Нажимая кнопку «Начать собеседование», вы подтверждаете свое информированное согласие на предоставление платформе IT-WorkRu доступа к записи ваших персональных данных, включая аудио- и видеозаписи, а также согласие на сохранение, обработку и анализ ваших ответов в текстовом формате, с использованием вашего браузера.</p>
+                  <p>Вы также даете свое информированное согласие на предоставление работодателю доступа к полной видеозаписи интервью, вашим текстовым ответам на вопросы, а также к аналитическим данным по ним.</p>
+<br><br>
+    <button id="startInterviewButton" class="form__password-button btn">
+      Начать собеседование
+    </button>
+  </div>
+</div>
+
+<script>
+async function fetchAndLogResults(sessionId) {
+    try {
+        const response = await fetch(`http://localhost:8101/get_results/${sessionId}`);
+        if (!response.ok) {
+            throw new Error("Ошибка при получении результатов");
+        }
+
+        const data = await response.json();
+
+        console.log("📊 Процент соответствия:", data.percentage_match);
+
+        if (data.scores_by_skill && Object.keys(data.scores_by_skill).length > 0) {
+            console.log("\n📌 Оценки по навыкам:");
+            for (const [skill, scores] of Object.entries(data.scores_by_skill)) {
+                console.log(`🔹 ${skill}: ${scores.reduce((a,b) => a + b, 0)} баллов | Детали: ${scores}`);
+            }
+        }
+
+        if (data.conversation_log && data.conversation_log.length > 0) {
+            console.log("\n📜 Полная история диалога:");
+            data.conversation_log.forEach(line => console.log(line));
+        }
+
+            // 🔥 Добавим вывод суммаризации, если она есть
+        if (data.summary) {
+            console.log("\n📝 Суммаризация интервью:");
+            console.log(data.summary);
+
+            // Также можно отобразить это в HTML (если хочешь)
+            const summaryElement = document.getElementById("interviewSummary");
+            if (summaryElement) {
+                summaryElement.textContent = data.summary;
+            }
+        }
+
+        return data;
+
+    } catch (error) {
+        console.error("❌ Ошибка получения результатов:", error);
+    }
+}
+
+async function checkIfInterviewCompleted(sessionId) {
+    try {
+        const response = await fetch(`http://localhost:8101/get_results/${sessionId}`);
+        if (!response.ok) {
+            console.warn("❌ Ошибка получения данных:", response.status);
+            return false;
+        }
+
+        const data = await response.json();
+
+        // Проверяем, все ли навыки оценены (по 3 оценки на каждый)
+        const allSkillsAnswered = Object.values(data.scores_by_skill).every(
+            scores => scores.length >= 3
+        );
+
+        if (allSkillsAnswered) {
+            console.log("✅ Все навыки оценены. Интервью завершено.");
+            fetchAndLogResults(sessionId);
+
+            // --- ДОБАВЛЕНО: отправка процента соответствия на Django ---
+            const percentageMatch = data.percentage_match.replace("%", "").trim(); // "87.20%"
+            const conversationLog = data.conversation_log;
+            const summary = data.summary || "";
+
+            // Отправляем данные на Django
+            const interviewResponse = await fetch("/api/interview/update-match/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCsrfToken_1(), // если используешь CSRF
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    percentage: parseFloat(percentageMatch),
+                    conversation_log: conversationLog,
+                    summary: summary
+                })
+            });
+
+            if (interviewResponse.ok) {
+                console.log("✅ Процент соответствия успешно передан в Django");
+            } else {
+                console.error("❌ Не удалось передать процент соответствия");
+            }
+
+            return true;
+        } else {
+            console.log("🕒 Интервью ещё не завершено. Ждём следующих оценок...");
+            return false;
+        }
+    } catch (error) {
+        console.error("❌ Ошибка проверки завершения интервью:", error);
+        return false;
+    }
+}
+
+function getCsrfToken_1() {
+    const csrfCookie = document.cookie
+        .split("; ")
+        .find(row => row.startsWith("csrftoken="));
+    return csrfCookie ? csrfCookie.split("=")[1] : null;
+}
+
+  const speakingIndicator = document.querySelector('.speaking-indicator');
+  const speakingText = document.querySelector('.speaking-text');
+
+
+
+  // Получаем элементы DOM (объявляем переменные один раз)
+  const popupWrapper = document.getElementById("popupWrapper_interview");
+  const startInterviewButton = document.getElementById("startInterviewButton");
+  const videoPlayer = document.getElementById("currentVideo");
+  const micButton = document.getElementById("microphoneButton");
+
+  let mediaRecorder;
+  let audioChunks = [];
+
+  // Функция для обновления состояния анимации
+function updateStatus(state) {
+  if (state === 'speaking') {
+    speakingIndicator.classList.remove('thinking');
+    speakingIndicator.classList.add('speaking');
+    speakingText.textContent = 'говорит';
+    speakingIndicator.style.display = 'flex'; // Показываем анимацию
+  } else if (state === 'thinking') {
+    speakingIndicator.classList.remove('speaking');
+    speakingIndicator.classList.add('thinking');
+    speakingText.textContent = 'думает';
+    speakingIndicator.style.display = 'flex'; // Показываем анимацию
+  } else {
+    speakingIndicator.style.display = 'none'; // Скрываем анимацию
+    speakingText.textContent = '';
+  }
+}
+
+// Обновление состояния видео
+function updateVideoStatus() {
+  if (videoPlayer.paused || videoPlayer.ended) {
+    updateStatus(null); // Скрываем анимацию, если видео остановлено
+  } else {
+    updateStatus('speaking'); // Показываем анимацию "говорит", если видео играет
+  }
+}
+
+// Обработчики событий для видео
+if (videoPlayer) {
+  videoPlayer.addEventListener('play', updateVideoStatus);
+  videoPlayer.addEventListener('pause', updateVideoStatus);
+  videoPlayer.addEventListener('ended', updateVideoStatus);
+
+  // Инициализация состояния при загрузке страницы
+  updateVideoStatus();
+}
+
+  // Функция для отображения попапа
+  function showPopup() {
+    popupWrapper.style.opacity = "1";
+    popupWrapper.style.pointerEvents = "auto";
+  }
+
+  // Функция для скрытия попапа
+  function hidePopup() {
+    popupWrapper.style.opacity = "0";
+    popupWrapper.style.pointerEvents = "none";
+  }
+
+  // Показываем попап при загрузке страницы
+  window.addEventListener("load", () => {
+    showPopup();
+  });
+
+  // Обработчик события для кнопки "Начать собеседование"
+  startInterviewButton.addEventListener("click", () => {
+    hidePopup(); // Скрываем попап
+    videoPlayer.play(); // Запускаем воспроизведение первого видео
+  });
+
+  // 🎬 Когда видео заканчивается, начинаем запись
+  videoPlayer.addEventListener("ended", () => {
+    console.log("Видео закончилось — начинаем запись аудио...");
+    startRecording();
+  });
+
+  // 🎤 Функция запуска записи
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.start();
+
+        audioChunks = [];
+
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        console.log("Запись началась...");
+      })
+      .catch(err => {
+        console.error("Ошибка доступа к микрофону:", err);
+      });
+  }
+
+  micButton.addEventListener("click", () => {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+    updateStatus('thinking');
+        mediaRecorder.stop();
+
+        mediaRecorder.addEventListener("stop", () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const formData = new FormData();
+            formData.append("file", audioBlob);
+
+            // Получаем session_id из localStorage
+            const sessionId = localStorage.getItem("session_id");
+            if (sessionId) {
+                formData.append("session_id", sessionId);  // Добавляем session_id в запрос
+            } else {
+                console.error("session_id не найден");
+                return;
+            }
+
+            fetch("http://localhost:8101/process_audio/", {
+            // fetch("https://fussily-phenomenal-shearwater.cloudpub.ru/process_audio/", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.blob())  // Обрабатываем ответ как файл
+            .then(videoBlob => {
+    const videoUrl = URL.createObjectURL(videoBlob);
+    videoPlayer.src = videoUrl;
+    videoPlayer.load();
+
+    const handleVideoEnd = async () => {
+        const sessionId = localStorage.getItem("session_id");
+        if (sessionId) {
+            await checkIfInterviewCompleted(sessionId);
+        } else {
+            console.warn("❌ Session ID не найден.");
+        }
+
+        videoPlayer.removeEventListener("ended", handleVideoEnd);
+    };
+
+    videoPlayer.addEventListener("ended", handleVideoEnd);
+    videoPlayer.play();
+    updateStatus('speaking');
+})
+            .catch(error => {
+                console.error("Ошибка при отправке аудио:", error);
+            });
+        });
+    }
+});
+
+
+async function sendVideoLink() {
+    const videoUrl = "{{ questions.0.video.url }}";
+    const gender = "{{ interview.gender }}";  // Получаем пол из шаблона
+    const skills = "{{ vacancy.skills_hidden }}";
+    const title = "{{ vacancy.title }}";
+    const interviewUniqueLink = "{{ interview.unique_link }}";
+
+    if (!videoUrl) {
+        console.error("Видео не найдено.");
+        return;
+    }
+
+    const data = {
+        video_url: videoUrl,
+        gender: gender,  // Добавляем пол
+        skills: skills,
+        title: title,
+        interview_unique_link: interviewUniqueLink
+    };
+
+    const res = await fetch("http://localhost:8101/upload_video_link/", {
+       // const res = await fetch("https://fussily-phenomenal-shearwater.cloudpub.ru/upload_video_link/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        const responseJson = await res.json();  // Получаем ответ от сервера
+        const sessionId = responseJson.session_id;  // Предполагаем, что сервер возвращает session_id
+        console.log("Сессия создана, session_id:", sessionId);
+
+        // Сохраняем session_id, например, в localStorage или как-то иначе
+        // localStorage.setItem("session_id", sessionId);
+        localStorage.setItem("session_id", interviewUniqueLink);
+    } else {
+        console.error("Ошибка при отправке данных.");
+    }
+}
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("startInterviewButton").addEventListener("click", sendVideoLink);
+});
+
+
+
+
+</script>
+
+<!--
+{% if questions %}
+  <script>
+    // Собираем URL всех видео из вопросов
+    const videoUrls = [
+      {% for question in questions %}
+        "{% if question.video %}{{ question.video.url }}{% else %}#{% endif %}"{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+  </script>
+{% else %}
+  <script>
+    const videoUrls = [];
+  </script>
+{% endif %}
+
+<input type="hidden" id="questionId" value="{{ questions.0.id }}">
+
+<script>
+    function getCSRFToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const popup = document.getElementById('popupWrapper_interview');
+    const startButton = document.getElementById('startInterviewButton');
+    const microphoneButton = document.getElementById('microphoneButton');
+    const currentVideo = document.getElementById('currentVideo');
+
+    let currentVideoIndex = 0;
+    let mediaRecorder;
+    let audioChunks = [];
+
+    setTimeout(() => {
+        popup.style.display = 'flex';
+        setTimeout(() => { popup.style.opacity = '1'; }, 10);
+    }, 500);
+
+    startButton.addEventListener('click', function () {
+        popup.style.opacity = '0';
+        setTimeout(() => {
+            popup.style.display = 'none';
+            microphoneButton.style.display = 'inline-block';
+        }, 500);
+
+        if (videoUrls.length > 0) {
+            currentVideoIndex = 0;
+            playVideo(currentVideoIndex);
+        }
+    });
+
+    microphoneButton.addEventListener('click', function () {
+        console.log("Кнопка микрофона нажата");
+
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            stopRecording();
+        } else {
+            console.log("Запись не была активной");
+        }
+
+        if (currentVideoIndex < videoUrls.length - 1) {
+            currentVideoIndex++;
+            playVideo(currentVideoIndex);
+        } else {
+            console.log("Все видео просмотрены");
+        }
+    });
+
+    function playVideo(index) {
+    if (videoUrls[index] && videoUrls[index] !== "#") {
+        currentVideo.pause();
+        microphoneButton.disabled = true;
+        const source = currentVideo.querySelector('source');
+        source.src = videoUrls[index];
+        currentVideo.load();
+        currentVideo.play();
+
+        // 🔹 Обновляем `questionId` перед началом нового видео
+        document.getElementById('questionId').value = questionIds[index - 1] || questionIds[0];
+
+        currentVideo.onended = function () {
+            microphoneButton.disabled = false;
+            startRecording();
+        };
+    }
+}
+
+
+    function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+
+                    if (audioChunks.length > 0) {
+                        sendAudioChunk(audioChunks);
+                        audioChunks = [];
+                    }
+                };
+
+                mediaRecorder.start();
+                console.log("Началась запись аудио...");
+
+                mediaRecorder.onstop = () => {
+                    if (audioChunks.length > 0) {
+                        sendAudioChunk(audioChunks);
+                    }
+                };
+            })
+            .catch(error => {
+                console.error("Ошибка при получении доступа к микрофону:", error);
+            });
+    }
+
+    function sendAudioChunk(audioChunks) {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'audio_response.wav');
+
+        fetch('http://127.0.0.1:8122/transcribe_wav/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': getCSRFToken() },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Ответ сервера:', data);
+            if (data.transcribed_text) {
+                console.log('Транскрибированный текст:', data.transcribed_text);
+                sendTextAnswer(data.transcribed_text);
+            } else {
+                console.log('Ошибка при получении транскрипции');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при отправке аудио на сервер:', error);
+        });
+    }
+
+    function sendTextAnswer(transcribed_text) {
+        const questionId = document.getElementById('questionId').value;  // Получение ID текущего вопроса
+
+        fetch('http://127.0.0.1:8000/save_answer/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ transcribed_text: transcribed_text, question_id: questionId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log("Ответ успешно сохранен.");
+            } else {
+                console.error("Ошибка при сохранении ответа:", data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка отправки ответа:", error);
+        });
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.stop();
+            console.log("Запись завершена");
+        } else {
+            console.log("Запись уже остановлена или не началась");
+        }
+    }
+});
+
+        var questionIds = [{% for question in questions %}{{ question.id }}{% if not forloop.last %}, {% endif %}{% endfor %}];
+
+</script>-->
+
+
+<!-- ==== ЗАПИСЬ ВИДЕО ОТВЕТА СОИСКАТЕЛЯ ==== -->
+<script>
+    // ==== УНИКАЛЬНЫЕ ПЕРЕМЕННЫЕ, ЧТОБЫ НЕ КОНФЛИКТОВАТЬ С ДРУГИМ JS ====
+    let candidateVideoRecorder;
+    let videoResponseBlobs = [];
+
+    // ==== ПРОВЕРЯЕМ ИЛИ СОЗДАЁМ videoElement ====
+    const videoElement = document.getElementById('video') || document.createElement('video');
+
+    // ==== ОБРАБОТЧИК СОБЫТИЙ ДЛЯ currentVideo (БЕЗ ДУБЛИРОВАНИЯ) ====
+    const currentVideo = document.getElementById("currentVideo");
+    if (currentVideo && !currentVideo._videoResponseHandlerAdded) {
+        currentVideo.addEventListener("ended", () => {
+            console.log("Видео закончилось — начинаем запись ответа...");
+            startVideoRecording();
+        });
+        currentVideo._videoResponseHandlerAdded = true;
+    }
+
+    // ==== ОБРАБОТЧИК СОБЫТИЙ ДЛЯ microphoneButton (БЕЗ ДУБЛИРОВАНИЯ) ====
+    const microphoneButton = document.getElementById("microphoneButton");
+    if (microphoneButton && !microphoneButton._videoResponseHandlerAdded) {
+        microphoneButton.addEventListener("click", () => {
+            console.log("Микрофон нажат — останавливаем запись видео...");
+            stopAndUploadVideo();
+        });
+        microphoneButton._videoResponseHandlerAdded = true;
+    }
+
+    function startVideoRecording() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error("❌ getUserMedia не поддерживается");
+        return;
+    }
+
+    // ==== Останавливаем текущее видео (вопрос от AI) ====
+    if (currentVideo && !currentVideo.paused) {
+        currentVideo.pause();
+        console.log("Видео-вопрос остановлено");
+    }
+
+    // ==== Останавливаем аудиозапись, если она активна ====
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+        console.log("Аудиозапись остановлена");
+    }
+
+    videoResponseBlobs = [];
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+            candidateVideoRecorder = new MediaRecorder(stream);
+            candidateVideoRecorder.ondataavailable = event => {
+                if (event.data.size > 0) {
+                    videoResponseBlobs.push(event.data);
+                }
+            };
+            candidateVideoRecorder.start();
+            console.log("🎥 Видео и аудио записываются...");
+
+            if (videoElement) {
+                videoElement.srcObject = stream;
+                videoElement.muted = true; // ❗ Отключаем воспроизведение звука
+            }
+        })
+        .catch(err => {
+            console.error("❌ Ошибка доступа к камере/микрофону:", err);
+        });
+}
+
+    function stopAndUploadVideo() {
+        if (candidateVideoRecorder && candidateVideoRecorder.state !== 'inactive') {
+            candidateVideoRecorder.stop();
+
+            candidateVideoRecorder.onstop = () => {
+                const videoBlob = new Blob(videoResponseBlobs, { type: 'video/webm' });
+
+                // Проверяем, есть ли данные
+                if (videoBlob.size === 0) {
+                    console.error("❌ Видео не записано — blob пустой");
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("video_response", videoBlob, "response.webm");
+
+                const questionId = "{{ questions.0.id }}";
+                if (!questionId || questionId === "") {
+                    console.error("❌ ID вопроса не найден");
+                    return;
+                }
+                formData.append("question_id", questionId);
+
+                const csrfToken = getCsrfToken();
+                if (!csrfToken) {
+                    console.error("❌ CSRF токен не найден");
+                    return;
+                }
+
+                fetch("/save_interview_video_response/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error("❌ Ошибка ответа сервера:", response.status);
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data?.success) {
+                        console.log("✅ Видео успешно сохранено");
+                    } else {
+                        console.error("❌ Ошибка сохранения:", data?.message || "Неизвестная ошибка");
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Ошибка отправки видео:", error);
+                });
+
+                if (videoElement && videoElement.srcObject) {
+                    const stream = videoElement.srcObject;
+
+
+                }
+            };
+        }
+    }
+
+    function getCsrfToken() {
+        const csrfCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='));
+        const token = csrfCookie ? csrfCookie.split('=')[1] : null;
+        if (!token) {
+            console.error("❌ CSRF токен не найден");
+        }
+        return token;
+    }
+</script>
+
+
+
+
+
+<footer>
+    &copy; 2024 IT-WorkRu. Все права защищены.
+</footer>
+
+</body>
+</html>

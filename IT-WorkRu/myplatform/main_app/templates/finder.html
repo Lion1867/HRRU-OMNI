@@ -1,0 +1,3007 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>IT-WorkRu - интеллектуальная платформа для поиска вакансий и образовательных ресурсов</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png">
+    <style>
+
+        html {overflow: visible;}
+        html, body {
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 0;
+
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Растягиваем шапку на всю ширину */
+            box-sizing: border-box;
+        }
+        header a {
+            text-decoration: none;
+            color: #000;
+            margin-right: 35px;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #0056b3;
+        }
+        .login-btn {
+            font-weight: bold;
+            background-color: #0056b3;
+            color: #fff;
+            padding: 10px 23px;
+            border-radius: 12px;
+            text-decoration: none;
+        }
+        .login-btn:hover {
+            background-color: #003f8c;
+            color: white;
+        }
+        .main-content {
+            position: relative;
+            text-align: left;
+            min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+
+        }
+        .main-content h1 {
+            font-size: 32px;
+            color: #333;
+        }
+        .main-content p {
+            font-size: 18px;
+            color: #333;
+        }
+        .search-box {
+            margin-top: 45px;
+            display: flex;
+            align-items: center;
+            border: 2px solid #DCDCDC; /* Граница для всего блока */
+            border-radius: 5px; /* Скругление углов всего блока */
+
+        }
+
+        .search-box input[type="text"] {
+            padding-top: 17.5px; padding-bottom: 17.5px; padding-left: 23px;
+            width: 400px; /* Увеличение ширины */
+            font-size: 16px;
+            border: none; /* Убираем границу у input */
+            flex-grow: 1; /* Дает input занимать доступное пространство */
+        }
+
+        .search-box button {
+            padding: 19px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #003f8c;
+        }
+        .search-box input[type="text"]:focus {
+        outline: none; /* Добавляем свою рамку при фокусе */
+        }
+        footer {
+            position: fixed; /* или absolute */
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+/* Для контейнера выпадающего списка */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Скрытый контент выпадающего списка */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    top: 240%; /* Используем позиционирование для отображения списка */
+    text-align: left;
+}
+
+/* Псевдоэлемент для создания буферной зоны */
+.dropdown::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 46px; /* Высота буферной зоны */
+    background: transparent;
+    z-index: 0;
+}
+
+/* Показываем выпадающий список при наведении */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Оформление ссылок внутри выпадающего списка */
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px; /* Добавляем отступы внутри элементов */
+    width: 100%; /* Ссылка занимает всю ширину */
+    box-sizing: border-box; /* Включаем отступы и границы в размеры элемента */
+    color: black;
+    text-decoration: none;
+}
+
+/* При наведении на ссылку изменяется цвет фона по всей ширине */
+.dropdown-content a:hover {
+    background-color: #f0f0f0; /* Более светлый цвет фона */
+    border: none; /* Убираем границы */
+    color: #0056b3; /* Изменяем цвет текста */
+}
+
+
+
+        /* Стили для изображений в левом верхнем и правом нижнем углах */
+        .main-content img:first-of-type {
+            position: absolute;
+            top: -20px;
+            left: 0px;
+            width: 280px; /* Настройте размер изображения по необходимости */
+            height: auto;
+        }
+        .main-content img:last-of-type {
+            position: absolute;
+            bottom: 140px;
+            right: 0px;
+            width: 550px; /* Настройте размер изображения по необходимости */
+            height: auto;
+        }
+    .main-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        background-color: #f0f0f0;
+    }
+
+    .login-container {
+        position: relative;
+        padding: 30px;
+        border-radius: 10px;
+        width: 400px;
+
+        text-align: center;
+    }
+
+    .login-container h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #000000;
+        margin-bottom: 20px;
+    }
+
+    .login-container form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .login-container label {
+        font-size: 18px;
+        font-weight: 700;
+        text-align: left;
+        color: #000000;
+    }
+
+    .login-container input[type="email"],
+    .login-container input[type="password"] {
+        padding: 10px;
+        font-size: 16px;
+        border: 2px solid #DCDCDC;
+        border-radius: 5px;
+    }
+
+    .login-container input::placeholder {
+        color: #A1A1A1;
+    }
+
+    .login-container button {
+        padding: 12px;
+        background-color: #1D55A6;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .login-container button:hover {
+        background-color: #003f8c;
+    }
+
+    .additional-links a {
+        color: #1D55A6;
+        font-size: 16px;
+        font-weight: 700;
+        margin-top: 10px;
+        display: block;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .additional-links a:hover {
+        color: #FD494C;
+    }
+
+  /* Стили для обычного состояния */
+  .filter-hover {
+    background: #D4D4D4;
+    cursor: pointer; /* Указываем, что это кликабельный элемент */
+    transition: background 0.3s ease, border 0.3s ease;
+  }
+
+  /* Эффект при наведении */
+  .filter-hover:hover {
+    background: #bdbdbd;
+  }
+
+  /* Стили для выбранного состояния */
+  .filter-hover.selected {
+    background: #1D55A6; /* Синий фон для выбранной опции */
+    color: white; /* Белый текст */
+  }
+
+  .filter-hover.selected:hover {
+    background-color: #003f8c; /* Немного темнее синий при наведении */
+    color: white;
+  }
+
+.container {max-width: 1200px;
+width: 100%;
+margin: 0 auto;
+
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+</style>
+
+
+</head>
+<body>
+
+<header style="border-bottom: 4px solid #0056b3; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+    <div class="container">
+    <div>
+        <style>  .no-select {
+        user-select: none; /* Запрет выделения текста */
+        -webkit-user-select: none; /* Для WebKit-браузеров */
+        -moz-user-select: none; /* Для Firefox */
+        -ms-user-select: none; /* Для старых IE */
+    } </style>
+        <a class="no-select" href="../" style="font-family: Arial, sans-serif; font-size: 24px; font-weight: 800; color: #0056b3; text-decoration: none;">
+            IT-Work<span style="color: #FD494C;">Ru</span>
+        </a>
+    </div>
+        {% if not user.is_authenticated %}
+    <div style="display: flex; gap: 20px; align-items: center;">
+
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Работодателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти сотрудника</a>
+                <a href="../page_vacancy">Разместить вакансию</a>
+                <a href="../register_employer">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Соискателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти работу</a>
+                <a href="../page_resume">Создать резюме</a>
+                <a href="../register_applicant">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+        {% else %}
+
+        {% if user.role == "applicant" %}
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти работу</a>
+        </div>
+                <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_resume" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Создать резюме</a>
+        </div>
+
+     </div>
+        {% else %}
+
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти сотрудника</a>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_vacancy" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Разместить вакансию</a>
+        </div>
+
+</div>
+
+
+
+
+
+        {% endif %}
+
+
+         {% endif %}
+        {% if user.is_authenticated %}
+        <div class="dropdown" id="dropdown-important" style="display: flex; flex-direction: row;">
+
+        <img style="width: 38px; border-radius: 50%;" src="{% static 'profile.png' %}" alt="profile">
+        <div style="margin-left: 15px; text-align: left;">
+
+
+            <span style="color: #2A3137; font-size: 18px; font-family: Arial; font-weight: 700; word-wrap: break-word; display: block;">
+                {{ user.first_name }} {{ user.last_name }}
+            </span>
+            <span style="color: #A1A1A1; font-size: 16px; font-family: Arial; font-weight: 400; word-wrap: break-word; display: block;">
+                {{ user.email }}
+            </span>
+
+
+        </div>
+
+        <img class="rotating-image_1"
+     style="cursor: pointer; margin-top: 10px; margin-left: 16px; width: 13px; height: 20px; transform: rotate(-180deg); transition: transform 0.3s ease;"
+     src="{% static 'Down.png' %}"
+     alt="Down" />
+                   <div class="dropdown-content" style="margin-top: -40px; min-width: 300px; top: 240%;">
+                        {% if user.role == "applicant" %}
+                        <a href="../featured_jobs" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;"><img style="width: 23px; border-radius: 80%; margin-left: -3px; margin-bottom: -4px; padding-right: 7px;" src="{% static 'love_vacancies.png' %}" alt="love_vacancies">Избранные вакансии (0)</a>
+                        <a href="../person_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../person_account#my_resumes" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Мои резюме (0)</a>
+                       <a href="../person_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../person_account/#employers_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики работодателей (0)</a>
+                        <a href="../page_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_person/#change_password_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../person_account/#current_balance_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_person_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../person_account?action=openPopup_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% else %}
+                        <a href="../company_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../company_account#my_vacancies" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Вакансии компании (0)</a>
+                        <a href="../company_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../company_account#applicants_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики соискателей (0)</a>
+                        <a href="../page_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_company#change_password_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../company_account#current_balance_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_company_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../company_account?action=openPopup_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% endif %}
+<a href="#" onclick="logout()" style="display: flex; align-items: center;">
+    <img style="width: 23px; border-radius: 80%;  margin-left: -3px; margin-top: -2px; padding-right: 7px;" src="{% static 'exit_image_1.png' %}" alt="exit_image">
+    <span style=" font-family: Arial, sans-serif; font-size: 16px;">Выйти</span>
+</a>
+
+
+            </div>
+
+        </div>
+        {% else %}
+        <a href="../login" class="login-btn" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Войти</a>
+        {% endif %}
+
+
+
+
+    </div></div>
+</header>
+<script>
+// Получаем контейнер по ID
+const dropdownContainer = document.getElementById('dropdown-important');
+
+// Получаем стрелку
+const rotatingImage = dropdownContainer.querySelector('.rotating-image_1');
+
+// Добавляем обработчики событий на весь контейнер
+dropdownContainer.addEventListener('mouseover', () => {
+    rotatingImage.style.transform = 'rotate(0deg)'; // Поворачиваем стрелку вверх
+});
+
+dropdownContainer.addEventListener('mouseout', () => {
+    rotatingImage.style.transform = 'rotate(-180deg)'; // Возвращаем стрелку вниз
+});
+
+
+
+    function logout() {
+        fetch('{% url "logout" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                // Если выход успешен, обновите интерфейс или перезагрузите страницу
+                location.reload();  // Перезагрузка страницы
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе:', error));
+    }
+</script>
+
+<!--
+<form id="search-form" method="GET" action="{% url 'finder' %}" style="position: relative;">
+<div class="main-content">
+
+
+<div style="width: 1730px; height: 2429px; position: relative;">
+
+
+  <div style="width: 1440px; height: 2429px; left: 4.5vw; top: 0px; position: absolute; ">
+    <div style="width: 1440px; height: 2429px; left: 4.5vw; top: 0px; background: #f0f0f0;"></div>
+
+
+
+    <div style="width: 620px; height: 37px; left: 60px; top: 282px; position: absolute; color: #8D8C8C; font-size: 32px; font-family: Arial; font-weight: 700; word-wrap: break-word">Найдено 251 235 вакансий</div>
+    <div style="width: 1323px; height: 1444px; left: 60px; top: 586px; position: absolute">
+
+
+      <div style="width: 388px; height: 880px; left: 926px; top: 1px; position: absolute; background: white; border-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid">
+
+    <div class="account__border">
+      <form id="form__person" class="form__person" action="">
+        <label class="form__person-label">
+          <span class="form__person-span">Уровень компетенций</span>
+          <input
+            class="form__person-input"
+            type="text"
+            name="competence"
+            id="competence"
+            placeholder="Выбрать"
+          />
+        </label>
+        <div class="form__person-label">
+          <span class="form__person-span">Желаемый уровень дохода</span>
+          <div class="form__resume-box">
+            <input
+              class="form__person-input"
+              type="number"
+              name="from"
+              id="from"
+              placeholder="От"
+            />
+            <input
+              class="form__person-input"
+              type="number"
+              name="to"
+              id="to"
+              placeholder="До"
+            />
+          </div>
+        </div>
+        <label class="form__person-label">
+          <span class="form__person-span">Валюта</span>
+          <input
+            class="form__person-input"
+            type="text"
+            name="currency"
+            id="currency"
+            placeholder="₽"
+          />
+        </label>
+        <label class="form__person-label form__person-label__checkbox">
+          <div class="filter__form-box">
+            <input
+              class="form__person-checkbox"
+              type="checkbox"
+              name="telephoneShow"
+              value="1"
+            />
+            <div class="filter__form-content">
+              Показать только вакансии с указанием уровня дохода
+            </div>
+          </div>
+        </label>
+        <label class="form__person-label">
+          <span class="form__person-span">График работы</span>
+          <input
+            class="form__person-input"
+            type="text"
+            name="timeTable"
+            id="timeTable"
+            placeholder="Выбрать"
+          />
+        </label>
+        <label class="form__person-label">
+          <span class="form__person-span">Тип занятости</span>
+          <input
+            class="form__person-input"
+            type="text"
+            name="employ"
+            id="employ"
+            placeholder="Выбрать"
+          />
+        </label>
+        <div class="form__person-label">
+          <span class="form__person-span form__person-span_mb"
+            >Опыт работы</span
+          >
+          <div class="form__person-radio__box-col">
+            <label class="form__person-label__radio">
+              <input
+                class="form__person-radio"
+                type="radio"
+                name="exp"
+                value="0"
+              />
+              Нет опыта
+            </label>
+            <label class="form__person-label__radio">
+              <input
+                class="form__person-radio"
+                type="radio"
+                name="exp"
+                value="1"
+              />
+              От 1 до 3 лет
+            </label>
+            <label class="form__person-label__radio">
+              <input
+                class="form__person-radio"
+                type="radio"
+                name="exp"
+                value="2"
+              />
+              От 3 до 6 лет
+            </label>
+            <label class="form__person-label__radio">
+              <input
+                class="form__person-radio"
+                type="radio"
+                name="exp"
+                value="3"
+              />
+              Более 6
+            </label>
+          </div>
+        </div>
+        <label class="form__person-label">
+          <span class="form__person-span">Ключевые навыки</span>
+          <input
+            class="form__person-input"
+            type="text"
+            name="skills"
+            id="skills"
+            placeholder="Выбрать"
+          />
+        </label>
+        <button class="form__button-title btn" style="margin-top: 10px;">Показать</button>
+        <button class="form__button-title btn btn-reverse filter__button" style="margin-top: -5px;">
+          Сбросить фильтры
+        </button>
+      </form>
+    </div>
+
+      </div>
+        <style>
+            :root {
+  --c-black: #000000;
+  --c-dark: #202020;
+  --c-white: #ffffff;
+  --c-light: #eeeeee;
+  --c-gray: #bbbbbb;
+  --c-cyan: #afc4e4;
+  --c-blue: #1D55A6;
+  --c-red: #f66766;
+
+  --fz-s: 14px;
+  --fz-m: 16px;
+  --fz-l: 18px;
+  --fz-xl: 24px;
+  --fz-xxl: 36px;
+}
+
+.btn {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-blue);
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+.btn-reverse {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+.btn-reverse:hover {
+  background-color: var(--c-blue);
+  color: var(--c-white);
+}
+
+.form__title {
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+  margin: 45px 0 30px;
+}
+.form__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+.form__aside {
+  width: 25%;
+}
+.form__content {
+  width: 75;
+}
+
+.form__img-box {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.form__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.form__person-img__box {
+  aspect-ratio: 4/1;
+  margin-top: 10px;
+}
+
+.form__img-text {
+  font-size: var(--fz-s);
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+.form__button-title {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+.form__subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status {
+}
+.form__status-label {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status-input {
+}
+.form__status-text {
+  font-size: var(--fz-s);
+  color: var(--c-gray);
+  margin-top: 5px;
+}
+
+.form__person {
+}
+.form__content-title {
+  margin-top: 45px;
+}
+.form__content-title:first-child {
+  margin-top: 0px;
+}
+.form__person-label {
+  display: block;
+  margin-bottom: 15px;
+}
+.form__person-span {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.form__person-label:has(.form__person-input:required) .form__person-span::after,
+.required::after {
+  content: " *";
+  font-size: 1.3em;
+  color: var(--c-red);
+  margin-bottom: 15px;
+}
+
+.form__person-input {
+  width: 92%;
+  padding: 10px;
+  font-size: var(--fz-m);
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  background-color: #fff;
+}
+
+.form__person-radio__box {
+  display: flex;
+  grid-gap: 45px;
+}
+.form__person-label__radio {
+  display: block;
+  font-weight: 500;
+}
+.form__person-radio,
+.form__person-checkbox {
+  margin-right: 3px;
+}
+
+.form__person-label__checkbox {
+  font-weight: 700;
+}
+
+.form__password-button {
+  margin-bottom: 15px;
+  padding: 10px 30px;
+}
+.form__link-delete {
+  display: block;
+  color: var(--c-gray);
+  text-decoration: underline;
+  margin-bottom: 40px;
+}
+
+.form__button {
+  font-size: var(--fz-l);
+  width: 100%;
+  padding: 20px;
+}
+
+.form__aside-container {
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  padding: 25px 0;
+}
+
+.form__aside-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.form__aside-list {
+}
+
+.form__aside-item {
+  padding: 7px 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.form__aside-item:hover {
+  background-color: var(--c-light);
+}
+
+.form__aside-link {
+}
+
+.form__resume-box {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio {
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio:last-child {
+  margin-bottom: 0;
+}
+
+.form__button-content {
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.form__person-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form__person-box .form__status-input {
+  margin-right: 10px;
+}
+
+.form__person-box .form__status-label {
+  font-size: var(--fz-s);
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form__person-input__file {
+  display: none;
+}
+
+.form__person-input__file-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.form__person-input__file-img {
+  height: 27px;
+  aspect-ratio: 1/2;
+}
+
+.form__person-plus__box {
+  position: relative;
+}
+
+.form__person-plus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--c-blue);
+  height: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: var(--c-white);
+  border-radius: 0.5rem;
+}
+
+.form__person-span_mb {
+  margin-bottom: 15px;
+}
+
+.form__person-mtb {
+  margin: 30px 0;
+}
+
+/* account.component.html */
+
+.account__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 40px 0 30px;
+}
+
+.account__title-subtitle {
+  margin-right: auto;
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+}
+
+.account__title-text {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+}
+
+.account__title-button {
+  font-size: var(--fz-l);
+  padding: 10px 30px;
+}
+
+.account__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+
+.account__aside {
+  width: 20%;
+}
+.account__content {
+  width: 80%;
+}
+
+.account__name {
+  font-size: var(--fz-l);
+  font-weight: 700;
+  text-align: center;
+  margin: 10px 0;
+}
+.account__favourites {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fz-s);
+  margin-bottom: 20px;
+}
+.account__favourites-link {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.account__favourites-count {
+  border-radius: 100%;
+  background-color: var(--c-light);
+  padding: 0 5px;
+}
+.account__button-edit {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.account__border {
+  position: relative;
+  padding: 35px;
+  overflow: hidden;
+}
+.account__border-subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+.account__border-text {
+  margin-bottom: 25px;
+}
+.account__border-link__span {
+  display: block;
+  margin-bottom: 35px;
+}
+.account__border-link__span span {
+  color: var(--c-blue);
+}
+.account__border-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-item {
+  width: 23%;
+}
+.account__border-link {
+  width: 100%;
+  aspect-ratio: 1/1;
+}
+.account__border-img {
+  width: 100%;
+  height: 100%;
+}
+
+.account__border-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+.account__border-title-wrapper .account__border-title {
+  margin-bottom: 0;
+}
+.account__border-button {
+  padding: 10px 20px;
+}
+.account__border-content {
+  width: 100%;
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  color: var(--c-gray);
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.account__border-box {
+  min-height: 310px;
+  margin-bottom: 40px;
+}
+
+.vacancies__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 43px 25px;
+}
+.vacancies__item {
+}
+.vacancies__link {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fz-l);
+}
+.vacancies__title {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.vacancies__text {
+  color: var(--c-gray);
+  padding: 15px 0;
+}
+.vacancies__price {
+  font-weight: 700;
+}
+.account__container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 100px;
+  grid-gap: 5%;
+}
+.account__box {
+  width: 50%;
+  min-height: 450px;
+}
+.link__list {
+  margin-bottom: 40px;
+}
+.link__item {
+  margin-bottom: 20px;
+}
+.link__item:last-child {
+  margin-bottom: 0;
+}
+.link__link {
+  font-size: var(--fz-l);
+  display: block;
+  padding: 10px 30px;
+  background-color: var(--c-cyan);
+  border-radius: 0.5rem;
+}
+.link__button {
+  width: 50%;
+  min-width: 250px;
+  text-align: center;
+  padding: 10px 30px;
+  margin: 0 auto;
+}
+.account__development {
+}
+
+.company__time {
+  color: var(--c-gray);
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.company__box-link {
+  margin-bottom: 30px;
+}
+
+.company__link {
+  display: flex;
+  align-items: center;
+  font-size: var(--fz-s);
+  margin-bottom: 10px;
+}
+
+.company__link:last-child {
+  margin-bottom: 0;
+}
+
+.company__link span {
+  color: var(--c-blue);
+}
+
+.company__link img {
+  width: 25px;
+  aspect-ratio: 1/1;
+  margin-right: 5px;
+}
+
+.account__border-box__resume {
+  height: 590px;
+}
+
+.popup__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--c-gray);
+  margin-bottom: 100px;
+  padding: 30px 0;
+}
+
+.popup {
+  margin: 0 auto;
+  border: 1px solid var(--c-gray);
+  padding: 40px 60px;
+  border-radius: 0.5rem;
+  background-color: var(--c-light);
+}
+
+.popup button {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Эти 2 класса для демонстрации, просто удали */
+.filter__container,
+.registration__container {
+  width: 100%;
+  margin: 50px auto;
+}
+
+.registration__inner {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.registration__label {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.form__status-link {
+  color: var(--c-blue);
+  transition: all 0.3s ease-in-out;
+}
+.form__status-link:hover {
+  color: var(--c-red);
+}
+
+.registration__link {
+  display: block;
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--c-blue);
+  font-weight: 700;
+}
+
+.filter__inner {
+  width: 25%;
+  margin: 0 auto;
+}
+.filter__inner .account__border {
+  padding: 20px;
+}
+
+.filter__form-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter__form-content {
+  font-size: var(--fz-s);
+}
+
+.filter__button {
+  margin-bottom: 0;
+}
+
+        </style>
+
+      <div style="width: 307.30px; height: 75px; left: 0px; top: 1px; position: absolute; background: white; border-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid"></div>
+      <div style="width: 14px; height: 5.98px; left: 281.36px; top: 31px; position: absolute; transform: rotate(90deg); transform-origin: 0 0; color: black; font-size: 28px; font-family: Arial; font-weight: 400; word-wrap: break-word">^</div>
+      <div style="width: 178.60px; height: 36px; left: 18.96px; top: 23px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">За все время</div>
+      <div style="width: 565.06px; height: 76px; left: 323.93px; top: 0px; position: absolute">
+        <div style="width: 308.40px; height: 75px; left: 256.66px; top: 1px; position: absolute; background: white; border-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid"></div>
+        <div style="width: 14px; height: 7.81px; left: 538.40px; top: 34px; position: absolute; transform: rotate(90deg); transform-origin: 0 0; color: black; font-size: 28px; font-family: Arial; font-weight: 400; word-wrap: break-word">^</div>
+        <div style="width: 232.85px; height: 36px; left: 281.49px; top: 23px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">50 вакансий</div>
+        <div style="width: 239.06px; height: 75px; left: 0px; top: 0px; position: absolute; background: white; border-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid"></div>
+        <div style="width: 14px; height: 6.05px; left: 213.16px; top: 30px; position: absolute; transform: rotate(90deg); transform-origin: 0 0; color: black; font-size: 28px; font-family: Arial; font-weight: 400; word-wrap: break-word">^</div>
+        <div style="width: 180.07px; height: 36px; left: 19.66px; top: 23px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">По дате</div>
+      </div>
+
+
+    </div>
+
+<div style="width: 238px; height: 51px; left: 60px; top: 348px; position: absolute">
+  <div id="fullTimeOption" class="filter-hover"
+       style="width: 238px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="fullTimeText" style="width: 201px; height: 31px; left: 19px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Полная занятость
+    </div>
+  </div>
+</div>
+
+<div style="width: 266px; height: 51px; left: 307px; top: 348px; position: absolute">
+  <div id="partTimeOption" class="filter-hover"
+       style="width: 266px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="partTimeText" style="width: 236px; height: 31px; left: 15px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Частичная занятость
+    </div>
+  </div>
+</div>
+
+      <div style="width: 182.78px; height: 51px; left: 582px; top: 348px; position: absolute">
+  <div id="volont" class="filter-hover"
+       style="width: 182.78px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="volontText" style="width: 156px; height: 31px; left: 15px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Волонтерство
+    </div>
+  </div>
+</div>
+
+             <div style="width: 165px; height: 51px; left: 774px; top: 348px; position: absolute">
+  <div id="stager" class="filter-hover"
+       style="width: 165px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="stagerText" style="width: 135px; height: 31px; left: 15px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Стажировка
+    </div>
+  </div>
+</div>
+
+       <div style="width: 437px; height: 51px; left: 948px; top: 348px; position: absolute">
+  <div id="project" class="filter-hover"
+       style="width: 437px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="projectText" style="width: 399px; height: 31px; left: 20px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Проектная работа/разовое задание
+    </div>
+  </div>
+</div>
+
+       <div style="width: 219px; height: 51px; left: 872px; top: 418px; position: absolute">
+  <div id="office" class="filter-hover"
+       style="width: 219px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="officeText" style="width: 203px; height: 31px; left: 16px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Работа из офиса
+    </div>
+  </div>
+</div>
+
+       <div style="width: 238px; height: 51px; left: 625px; top: 418px; position: absolute">
+  <div id="svgraf" class="filter-hover"
+       style="width: 238px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="svgrafText" style="width: 215px; height: 31px; left: 12px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Свободный график
+    </div>
+  </div>
+</div>
+
+       <div style="width: 238px; height: 51px; left: 378px; top: 418px; position: absolute">
+  <div id="udalwork" class="filter-hover"
+       style="width: 238px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="udalworkText" style="width: 206px; height: 31px; left: 16px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Удаленная работа
+    </div>
+  </div>
+</div>
+
+       <div style="width: 98px; height: 51px; left: 271px; top: 418px; position: absolute">
+  <div id="Seniorwork" class="filter-hover"
+       style="width: 98px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="SeniorworkText" style="width: 70px; height: 31px; left: 14px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Senior
+    </div>
+  </div>
+</div>
+
+       <div style="width: 96.25px; height: 51px; left: 60px; top: 418px; position: absolute">
+  <div id="Juniorwork" class="filter-hover"
+       style="width: 96.20px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="JuniorworkText" style="width: 81.25px; height: 31px; left: 15px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Junior
+    </div>
+  </div>
+</div>
+
+             <div style="width: 97.06px; height: 51px; left: 165px; top: 418px; position: absolute">
+  <div id="Middlework" class="filter-hover"
+       style="width: 97.06px; height: 51px; left: 0px; top: 0px; position: absolute; border-radius: 60px; border: 1px rgba(169, 169, 169, 0.70) solid;">
+    <div id="MiddleworkText" style="width: 71px; height: 31px; left: 13.61px; top: 10px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">
+      Middle
+    </div>
+  </div>
+</div>
+
+
+<script>
+
+ // Получаем элементы для полной занятости
+    const Middlework = document.getElementById('Middlework');
+    const MiddleworkText = document.getElementById('MiddleworkText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  Middlework.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      MiddleworkText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      MiddleworkText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+     // Получаем элементы для полной занятости
+    const Juniorwork = document.getElementById('Juniorwork');
+    const JuniorworkText = document.getElementById('JuniorworkText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  Juniorwork.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      JuniorworkText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      JuniorworkText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+     // Получаем элементы для полной занятости
+    const Seniorwork = document.getElementById('Seniorwork');
+    const SeniorworkText = document.getElementById('SeniorworkText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  Seniorwork.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      SeniorworkText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      SeniorworkText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+     // Получаем элементы для полной занятости
+    const udalwork = document.getElementById('udalwork');
+    const udalworkText = document.getElementById('udalworkText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  udalwork.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      udalworkText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      udalworkText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+     // Получаем элементы для полной занятости
+    const svgraf = document.getElementById('svgraf');
+    const svgrafText = document.getElementById('svgrafText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  svgraf.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      svgrafText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      svgrafText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+         // Получаем элементы для полной занятости
+    const office = document.getElementById('office');
+    const officeText = document.getElementById('officeText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  office.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      officeText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      officeText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+    // Получаем элементы для полной занятости
+    const stager = document.getElementById('stager');
+    const stagerText = document.getElementById('stagerText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  stager.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      stagerText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      stagerText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+    // Получаем элементы для полной занятости
+    const project = document.getElementById('project');
+    const projectText = document.getElementById('projectText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  project.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      projectText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      projectText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+  // Получаем элементы для полной занятости
+  const volont = document.getElementById('volont');
+  const volontText = document.getElementById('volontText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  volont.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      volontText.style.color = 'white';  // Цвет текста на белый
+    } else {
+      volontText.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+  // Получаем элементы для полной занятости
+  const fullTimeOption = document.getElementById('fullTimeOption');
+  const fullTimeTextElement = document.getElementById('fullTimeText'); // Текст полной занятости
+
+  // Переключаем состояние для полной занятости
+  fullTimeOption.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      fullTimeTextElement.style.color = 'white';  // Цвет текста на белый
+    } else {
+      fullTimeTextElement.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+
+  // Получаем элементы для частичной занятости
+  const partTimeOption = document.getElementById('partTimeOption');
+  const partTimeTextElement = document.getElementById('partTimeText'); // Текст частичной занятости
+
+  // Переключаем состояние для частичной занятости
+  partTimeOption.addEventListener('click', function() {
+    this.classList.toggle('selected');  // Переключаем класс при нажатии
+
+    // Изменяем цвет текста в зависимости от состояния
+    if (this.classList.contains('selected')) {
+      partTimeTextElement.style.color = 'white';  // Цвет текста на белый
+    } else {
+      partTimeTextElement.style.color = 'black';  // Цвет текста на черный
+    }
+  });
+</script>
+
+
+
+    <div style="width: 147px; height: 75px; left: 1018px; top: 940px; position: absolute">
+
+
+
+
+    </div>
+
+    <img style="width: 79px; height: 82px; left: 1295px; top: 1597px; position: absolute; border-radius: 39.50px" src="{% static 'up.png' %}" alt="up" />
+  </div>
+  <div style="width: 992px; height: 100px; left: calc(4.5vw + 60px); top: 139px; position: absolute; color: black; font-size: 48px; font-family: Arial; font-weight: 700; word-wrap: break-word">Поиск вакансий IT-сферы <br/>от ведущих российских работодателей</div>
+
+
+
+
+
+    <div style="margin-left: calc(4.5vw + 60px); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; justify-content: space-between; margin-top: 698px; padding-bottom: 195px;">
+
+
+    {% if message %}
+        <div style="position: absolute; color: rgba(141.09, 140.15, 140.15, 0.56); font-size: 23px; font-weight: bold; text-align: left;">
+            {{ message|safe }}
+        </div>
+    {% else %}
+
+
+        {% for vacancy in vacancies %}
+            <div style="width: 888px; height: 317px; background: white; border-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid; display: flex; flex-direction: column; position: relative;">
+
+
+    <span style="position: relative; margin-top: 20px; color: black; font-size: 23px; font-family: Arial; font-weight: 700; word-wrap: break-word; text-align: right; margin-right: 25px; margin-bottom: -11px;">
+        {{ vacancy.salary }}
+    </span>
+
+                <img style="position: relative; width: 28px; height: 31px; margin-left: 25px; margin-bottom: -17px;" src="{% static 'like.png' %}" alt="like" />
+
+    <div style="margin-left: 67px; margin-top: -31px; color: black; font-size: 23px; font-family: Arial; font-weight: 700; word-wrap: break-word; max-width: 50%; padding-right: 10px;">
+        {{ vacancy.title }}
+    </div>
+
+                <div style="margin-left: 47.5px; margin-top: 15px; margin-bottom: 10px; padding: 0 20px; font-size: 15px; color: #8D8C8C;">
+                    <div>{{ vacancy.company }}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;{{ vacancy.location }}</div>
+                </div>
+
+                <div style="margin-left: 47.5px; padding: 0 20px; font-size: 15px; color: #8D8C8C;">
+                    {{ vacancy.schedule }}
+                </div>
+
+                <div style="position: relative;  margin-left: 66.5px; margin-top: 20px; padding: 0 20px; font-size: 15px; color: #8D8C8C;">
+                    <img style="margin-top: 15px; width: 26px; height: 26px;" src="{% static 'hh_vacancies.png' %}" alt="hh_vacancies" />
+                    &nbsp;&nbsp;&nbsp;&nbsp;{{ vacancy.time_posted }} с
+                    <span style="color: #1D55A6;">{{ vacancy.source }}</span>
+                </div>
+
+                <div style="display: flex; flex-direction: row; justify-content: space-between; padding: 0 20px; margin-top: 20px;">
+                    <div style="margin-left: 47.5px; color: #1D55A6; font-size: 16px;">Описание вакансии</div>
+
+<img class="rotating-image" onclick="toggleTextAndRotate(this)"
+     style="cursor: pointer; position: relative; margin-left: -288px; margin-right: 60px; margin-top: 19.5px; width: 13px; height: 20px; transform: rotate(-180deg); transition: transform 0.3s ease;"
+     src="{% static 'Down.png' %}"
+     alt="Down" />
+
+
+<div class="vacancy-description"
+     style="display: none; position: relative; margin-left: 20px; margin-top: 10px; color: #333; font-size: 14px; white-space: pre-line;">
+     {{ vacancy.keywords }}
+</div>
+
+
+
+
+<style>
+    .hover-button {
+        margin-left: 47.5px;
+        width: 177px;
+        height: 40px;
+        background: white;
+        border-radius: 11px;
+        border: 1px #1D55A6 solid;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s, color 0.3s; /* Плавный переход */
+    }
+
+    .hover-button span {
+        color: #1D55A6;
+        font-size: 16px;
+        font-family: Arial;
+        font-weight: 400;
+    }
+
+    /* Стиль при наведении */
+    .hover-button:hover {
+        background: #1D55A6; /* Цвет границы как фон */
+    }
+
+    .hover-button:hover span {
+        color: white; /* Белый текст */
+    }
+</style>
+
+
+
+
+
+<div style="margin-top: -55px; margin-right: -15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+
+    <a href="{{ vacancy.url }}" target="_blank" style="text-decoration: none;">
+        <div class="hover-button">
+            <span>Подробнее</span>
+        </div>
+    </a>
+</div>
+</div>
+
+
+
+<div style="margin-left: 67.5px; margin-right: 67.5px; margin-top: 3px; display: flex; flex-wrap: wrap; gap: 10px;">
+  {% for skill in vacancy.skills|slice:":8" %}
+    <div style="padding: 10px 20px; background: rgba(190, 190, 190, 0.28); border-radius: 11px; border: solid 2px rgba(169, 169, 169, 0.70); font-size: 16px; color: black;">
+      {{ skill }}
+    </div>
+  {% endfor %}
+</div>
+
+
+
+            </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    // Устанавливаем прокрутку в начало страницы
+    window.scrollTo(0, 0);
+});
+
+
+    // Получаем все элементы с классом "rotating-image"
+const images = document.querySelectorAll('.rotating-image');
+
+// Функция для переключения видимости текста и поворота изображения
+function toggleTextAndRotate(image) {
+    // Найти следующий элемент (текстовый блок) после изображения
+    const textBlock = image.nextElementSibling;
+
+    if (textBlock) {
+        // Переключение отображения текста
+        if (textBlock.style.display === 'none' || textBlock.style.display === '') {
+            textBlock.style.display = 'block';
+        } else {
+            textBlock.style.display = 'none';
+        }
+
+        // Поворот изображения
+        const isRotatedClockwise = image.style.transform === 'rotate(0deg)';
+        image.style.transform = isRotatedClockwise ? 'rotate(-180deg)' : 'rotate(0deg)';
+    }
+}
+
+
+ </script>
+<style> #rotating-image {
+    cursor: pointer;
+    transform: rotate(-180deg);
+    transition: transform 0.3s ease; /* Плавный переход */
+}
+ </style>
+
+
+
+
+
+
+
+  <div style="width: 1314px; height: 75px; left: calc(4.5vw + 60px); top: 491px; position: absolute">
+    <div style="width: 1314px; height: 75px; left: 0px; top: 0px; position: absolute">
+      <div style="width: 1314px; height: 75px; left: 0px; top: 0px; position: absolute">
+        <div style="width: 1110.41px; height: 75px; left: 8px; top: 0px; position: absolute; background: white; border-top-left-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid"></div>
+          <style>
+                  .search-btn {
+            all: unset; /* Сбрасываем стили кнопки */ position: relative; left: 1113.40px; top: 1px; width: 200.60px; height: 75px;
+            width: 200.60px;
+            height: 75px;
+            background: #1D55A6;
+            border-bottom-right-radius: 11px;
+            border-top-right-radius: 11px;
+            border: 1px solid #1D55A6;
+            cursor: pointer;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+                  .search-btn:hover {
+            background-color: #003f8c;
+        }
+        </style>
+
+    <button type="submit" class="search-btn"
+    >
+
+        <span
+            style="
+                color: white;
+                font-size: 24px;
+                font-family: Arial;
+                font-weight: 400; /* Тонкий, но не слабый шрифт */
+                word-wrap: break-word;
+                text-align: center;
+            "
+        >
+            Найти
+        </span>
+    </button>
+
+
+
+
+    <input id="search-input"
+           name="query"
+           type="text"
+           placeholder="Специальность, должность или компания"
+           style="width: 647.58px; height: 36px; position: absolute; left: 246.44px; top: 20px; color: black; font-size: 24px; font-family: Arial; font-weight: 400; border: none; padding: 0 10px; box-sizing: border-box; outline: none;"
+           onfocus="this.style.color='black'"
+           onblur="if (this.value === '') this.style.color='#A1A1A1'"
+           value="{{ request.GET.query }}"
+    >
+
+        <div style="width: 124.72px; height: 36px; left: 944px; top: 22.5px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">Вакансии</div>
+        <div style="width: 210.52px; height: 75px; left: 0px; top: 0px; position: absolute; background: white; border-top-left-radius: 11px; border-bottom-left-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid"></div>
+        <div style="width: 78.82px; height: 27px; left: 65.85px; top: 24px; position: absolute; color: black; font-size: 24px; font-family: Arial; font-weight: 400; word-wrap: break-word">Россия</div>
+      </div>
+      <div style="width: 14px; height: 28.30px; left: 1088.18px; top: 32px; position: absolute; transform: rotate(90deg); transform-origin: 0 0; color: black; font-size: 28px; font-family: Arial; font-weight: 400; word-wrap: break-word">^</div>
+    </div>
+    <img style="width: 23px; height: 32px; left: 28px; top: 23px; position: absolute" src="{% static 'Geo.png' %}" alt="Geo" />
+    <img style="width: 19px; height: 26px; left: 163px; top: 27px; position: absolute" src="{% static 'Down.png' %}" alt="Down" />
+  </div>
+
+</div>
+</div>
+</form>
+-->
+<!--
+      <div style="width: 888px; height: 130px; left: 0px; top: 358px; position: absolute; background: white; border-radius: 11px; border: 2px rgba(169, 169, 169, 0.70) solid"></div>
+      <div style="width: 525px; height: 49px; left: 182px; top: 398px; position: absolute">
+        <div style="width: 525px; height: 49px; left: 0px; top: 0px; position: absolute; background: #1D55A6; border-radius: 11px; border: 1px #1D55A6 solid"></div>
+        <div style="width: 148.13px; height: 23px; left: 188px; top: 13px; position: absolute; color: white; font-size: 20px; font-family: Arial; font-weight: 700; word-wrap: break-word">Показать еще</div>
+      </div>
+>-->
+<div class="main_content">
+<div class="main">
+  <h1 class="search__title">
+    <span>Поиск вакансий IT-сферы
+     от ведущих российских работодателей </span>
+  </h1>
+
+  <h2 class="search__subtitle" style="color: var(--c-gray);">Найдено <b>251 235</b> вакансий</h2>
+
+  <ul class="features-options__inner" style="margin-top: 25px; margin-bottom: 20px;">
+    <li class="features-options__item">
+      <button class="features-options__button">Полная занятость</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">
+        Частичная занятость
+      </button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Волонтёрство</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Стажировка</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">
+        Проектная работа/разовое задание
+      </button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Junior</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Middle</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Senior</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Удаленная работа</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Свободный график</button>
+    </li>
+    <li class="features-options__item">
+      <button class="features-options__button">Работа из офиса</button>
+    </li>
+  </ul>
+
+  <div class="search__box-input">
+    <input class="search__select search__select-left" type="text" placeholder="Россия" />
+
+    <input
+      class="search__input"
+      type="text"
+      placeholder="Специальность, должность или компания"
+    />
+
+    <button class="search__button">Найти</button>
+  </div>
+
+  <div class="search__content">
+    <div class="search__content-box">
+      <div class="search__input-box">
+        <input type="text" class="search__content-input" placeholder="За всё время" />
+        <input type="text" class="search__content-input" placeholder="По дате" />
+        <input type="text" class="search__content-input" placeholder="50 вакансий" />
+      </div>
+
+
+          <!-- Вакансии всех работодателей -->
+ <style>
+/* Контейнер с прокруткой */
+.vacancy-scroll-container {
+  max-height: 750px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Стилизация скроллбара для Webkit (Chrome, Safari, Edge) */
+.vacancy-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.vacancy-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vacancy-scroll-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: background-color 0.3s;
+}
+
+.vacancy-scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Для Firefox */
+.vacancy-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.vacancy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vacancy-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.vacancy-info {
+  max-width: 80%;
+}
+
+.vacancy-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.vacancy-city {
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.vacancy-salary {
+  font-weight: bold;
+  color: #333;
+  white-space: nowrap;
+}
+
+.btn_2 {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: #007bff;
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid #007bff;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+
+.btn_2:hover {
+  background-color: var(--c-white);
+  color: #007bff;
+}
+
+.btn_3 {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-white); /* теперь фон белый */
+  color: #007bff; /* теперь текст синий */
+  border-radius: 0.5rem;
+  border: 1px solid #007bff;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+
+.btn_3:hover {
+  background-color: #007bff; /* при наведении фон синий */
+  color: var(--c-white); /* текст белый */
+}
+
+     /* Стиль после нажатия */
+.btn_3.clicked {
+  background-color: transparent;
+  color: var(--c-gray);
+  border: 1px solid var(--c-gray);
+  cursor: default !important;
+}
+
+</style>
+
+<div class="vacancy-scroll-container" style="margin-top: 20px;">
+  <div class="vacancy-list">
+    {% if all_vacancies %}
+      {% for vacancy in all_vacancies %}
+        <div class="vacancy-card">
+          <div class="vacancy-info">
+            <div class="vacancy-title">{{ vacancy.title }}</div>
+            <div class="vacancy-city">{{ vacancy.employer.company_name }} | {{ vacancy.city_1 }}</div>
+            <p style="margin-top: 20px;">{{ vacancy.created_at|date:"j E Y" }}</p>
+          </div>
+
+          <div class="vacancy-salary" style="display: flex; flex-direction: column; align-items: flex-end;">
+            <div>
+              {% if vacancy.salary_from_1 %}
+                от {{ vacancy.salary_from_1 }}
+              {% endif %}
+
+              {% if vacancy.salary_to_1 %}
+                до {{ vacancy.salary_to_1 }}
+              {% endif %}
+
+              {% if vacancy.currency_1 == "RUB" %}
+                руб.
+              {% elif vacancy.currency_1 == "USD" %}
+                $
+              {% elif vacancy.currency_1 == "EUR" %}
+                €
+              {% elif vacancy.currency_1 == "CNY" %}
+                ¥
+              {% else %}
+                {{ vacancy.currency_1 }}
+              {% endif %}
+            </div>
+
+            <br><br>
+            <div style="display: flex; justify-content: flex-end; width: 100%;">
+              <button class="account__border-button btn_2" style="cursor: pointer;">Подробнее</button>
+              {% if user.role != 'employer' %}
+                {% if user.is_authenticated and user.role == 'applicant' %}
+                  <!-- Если пользователь авторизован и роль applicant -->
+{% if vacancy.id in responded_vacancy_ids %}
+  <button class="account__border-button btn_3 clicked"
+          style="text-decoration: none; margin-left: 10px; cursor: default;" disabled>
+    📩 Отклик отправлен
+  </button>
+{% else %}
+  <button class="account__border-button btn_3"
+          style="text-decoration: none; margin-left: 10px; cursor: pointer;"
+          onclick="applyForVacancy({{ vacancy.id }}, this)">
+    Откликнуться
+  </button>
+{% endif %}
+
+                {% else %}
+                  <!-- Если пользователь не авторизован -->
+                  <a href="{% url 'login' %}" class="account__border-button btn_3"
+                     style="text-decoration: none; margin-left: 10px; cursor: pointer;">
+                    Откликнуться
+                  </a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>Нет вакансий для отображения.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function applyForVacancy(vacancyId, button) {
+    console.log("Applying for vacancy with ID:", vacancyId);
+    console.log("Button state before click:", button);
+
+    // Изменяем текст кнопки
+    button.textContent = "📩 Отклик отправлен";
+    button.classList.add('clicked');
+    button.disabled = true;
+
+    // Отправка заявки на вакансию через AJAX
+    const formData = new FormData();
+    formData.append('vacancy_id', vacancyId);
+
+    fetch("{% url 'apply_for_vacancy' 0 %}".replace('0', vacancyId), {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Server response:", data);
+        if (data.success) {
+            console.log("Success: Response recorded for vacancy ID", vacancyId);
+        } else {
+            console.error("Error: Failed to record response for vacancy ID", vacancyId);
+        }
+    })
+    .catch(error => {
+        console.error("Fetch error:", error);
+    });
+}
+
+</script>
+
+
+
+
+
+
+    </div>
+    <div class="search__content-aside">
+      <div class="account__border">
+        <form id="form__person" class="form__person" action="">
+          <label class="form__person-label">
+            <span class="form__person-span">Уровень компетенций</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="competence"
+              id="competence"
+              placeholder="Выбрать"
+            />
+          </label>
+          <div class="form__person-label">
+            <span class="form__person-span">Желаемый уровень дохода</span>
+            <div class="form__resume-box">
+              <input
+                class="form__person-input"
+                type="number"
+                name="from"
+                id="from"
+                placeholder="От"
+              />
+              <input
+                class="form__person-input"
+                type="number"
+                name="to"
+                id="to"
+                placeholder="До"
+              />
+            </div>
+          </div>
+          <label class="form__person-label">
+            <span class="form__person-span">Валюта</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="currency"
+              id="currency"
+              placeholder="P"
+            />
+          </label>
+          <label class="form__person-label form__person-label__checkbox">
+            <div class="filter__form-box">
+              <input
+                class="form__person-checkbox"
+                type="checkbox"
+                name="telephoneShow"
+                value="1"
+              />
+              <div class="filter__form-content">
+                Показать только вакансии с указанием уровня дохода
+              </div>
+            </div>
+          </label>
+          <label class="form__person-label">
+            <span class="form__person-span">График работы</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="timeTable"
+              id="timeTable"
+              placeholder="Выбрать"
+            />
+          </label>
+          <label class="form__person-label">
+            <span class="form__person-span">Тип занятости</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="employ"
+              id="employ"
+              placeholder="Выбрать"
+            />
+          </label>
+          <div class="form__person-label">
+            <span class="form__person-span form__person-span_mb"
+              >Опыт работы</span
+            >
+            <div class="form__person-radio__box-col">
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="0"
+                />
+                Есть опыт
+              </label>
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="1"
+                />
+                От 1 до 3 лет
+              </label>
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="2"
+                />
+                От 3 до 6 лет
+              </label>
+              <label class="form__person-label__radio">
+                <input
+                  class="form__person-radio"
+                  type="radio"
+                  name="exp"
+                  value="3"
+                />
+                Более 6
+              </label>
+            </div>
+          </div>
+          <label class="form__person-label">
+            <span class="form__person-span">Ключевые навыки</span>
+            <input
+              class="form__person-input"
+              type="text"
+              name="skills"
+              id="skills"
+              placeholder="Выбрать"
+            />
+          </label>
+          <button class="form__button-title btn">Показать</button>
+          <button class="form__button-title btn btn-reverse filter__button">
+            Сбросить фильтры
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<style>
+
+    .main_content {
+
+    min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+   max-width:  1220px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+    :root {
+  --c-black: #000000;
+  --c-dark: #202020;
+  --c-white: #ffffff;
+  --c-light: #eeeeee;
+  --c-gray: #bbbbbb;
+  --c-cyan: #afc4e4;
+  --c-blue: #0056b3;
+  --c-red: #f66766;
+
+  --fz-s: 14px;
+  --fz-m: 16px;
+  --fz-l: 18px;
+  --fz-xl: 24px;
+  --fz-xxl: 36px;
+}
+
+.btn {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-blue);
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+.btn-reverse {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+.btn-reverse:hover {
+  background-color: var(--c-blue);
+  color: var(--c-white);
+}
+
+.form__title {
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+  margin: 45px 0 30px;
+}
+.form__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+.form__aside {
+  width: 25%;
+}
+.form__content {
+  width: 75;
+}
+
+.form__img-box {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.form__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.form__person-img__box {
+  aspect-ratio: 4/1;
+  margin-top: 10px;
+}
+
+.form__img-text {
+  font-size: var(--fz-s);
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+.form__button-title {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+.form__subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status {
+}
+.form__status-label {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.form__status-input {
+}
+.form__status-text {
+  font-size: var(--fz-s);
+  color: var(--c-gray);
+  margin-top: 5px;
+}
+
+.form__person {
+}
+.form__content-title {
+  margin-top: 45px;
+}
+.form__content-title:first-child {
+  margin-top: 0px;
+}
+.form__person-label {
+  display: block;
+  margin-bottom: 15px;
+}
+.form__person-span {
+  display: block;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.form__person-label:has(.form__person-input:required) .form__person-span::after,
+.required::after {
+  content: " *";
+  font-size: 1.3em;
+  color: var(--c-red);
+  margin-bottom: 15px;
+}
+
+.form__person-input {
+  width: 100%;
+  padding: 10px;
+  font-size: var(--fz-m);
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  background-color: #fff;
+}
+
+.form__person-radio__box {
+  display: flex;
+  grid-gap: 45px;
+}
+.form__person-label__radio {
+  display: block;
+  font-weight: 500;
+}
+.form__person-radio,
+.form__person-checkbox {
+  margin-right: 3px;
+}
+
+.form__person-label__checkbox {
+  font-weight: 700;
+}
+
+.form__password-button {
+  margin-bottom: 15px;
+  padding: 10px 30px;
+}
+.form__link-delete {
+  display: block;
+  color: var(--c-gray);
+  text-decoration: underline;
+  margin-bottom: 40px;
+}
+
+.form__button {
+  font-size: var(--fz-l);
+  width: 100%;
+  padding: 20px;
+}
+
+.form__aside-container {
+  border: 1px solid var(--c-gray);
+  border-radius: 1rem / 1rem;
+  padding: 25px 0;
+}
+
+.form__aside-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.form__aside-list {
+}
+
+.form__aside-item {
+  padding: 7px 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+.form__aside-item:hover {
+  background-color: var(--c-light);
+}
+
+.form__aside-link {
+}
+
+.form__resume-box {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio {
+  margin-bottom: 10px;
+}
+
+.form__person-radio__box-col .form__person-label__radio:last-child {
+  margin-bottom: 0;
+}
+
+.form__button-content {
+  margin-bottom: 20px;
+  padding: 15px;
+}
+
+.form__person-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form__person-box .form__status-input {
+  margin-right: 10px;
+}
+
+.form__person-box .form__status-label {
+  font-size: var(--fz-s);
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.form__person-input__file {
+  display: none;
+}
+
+.form__person-input__file-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
+.form__person-input__file-img {
+  height: 27px;
+  aspect-ratio: 1/2;
+}
+
+.form__person-plus__box {
+  position: relative;
+}
+
+.form__person-plus {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--c-blue);
+  height: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  color: var(--c-white);
+  border-radius: 0.5rem;
+}
+
+.form__person-span_mb {
+  margin-bottom: 15px;
+}
+
+.form__person-mtb {
+  margin: 30px 0;
+}
+
+/* account.component.html */
+
+.account__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 40px 0 30px;
+}
+
+.account__title-subtitle {
+  margin-right: auto;
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+}
+
+.account__title-text {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+}
+
+.account__title-button {
+  font-size: var(--fz-l);
+  padding: 10px 30px;
+}
+
+.account__main {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  grid-gap: 3%;
+  margin-bottom: 70px;
+}
+
+.account__aside {
+  width: 20%;
+}
+.account__content {
+  width: 80%;
+}
+
+.account__name {
+  font-size: var(--fz-l);
+  font-weight: 700;
+  text-align: center;
+  margin: 10px 0;
+}
+.account__favourites {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fz-s);
+  margin-bottom: 20px;
+}
+.account__favourites-link {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.account__favourites-count {
+  border-radius: 100%;
+  background-color: var(--c-light);
+  padding: 0 5px;
+}
+.account__button-edit {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.account__border {
+  position: relative;
+  border: 1px solid var(--c-gray);
+  border-radius: 0.5rem;
+  padding: 35px;
+  overflow: hidden;
+}
+.account__border-subtitle {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+.account__border-text {
+  margin-bottom: 25px;
+}
+.account__border-link__span {
+  display: block;
+  margin-bottom: 35px;
+}
+.account__border-link__span span {
+  color: var(--c-blue);
+}
+.account__border-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-item {
+  width: 23%;
+}
+.account__border-link {
+  width: 100%;
+  aspect-ratio: 1/1;
+}
+.account__border-img {
+  width: 100%;
+  height: 100%;
+}
+
+.account__border-title-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.account__border-title {
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  margin-bottom: 50px;
+}
+.account__border-title-wrapper .account__border-title {
+  margin-bottom: 0;
+}
+.account__border-button {
+  padding: 10px 20px;
+}
+.account__border-content {
+  width: 100%;
+  font-size: var(--fz-xl);
+  font-weight: 700;
+  color: var(--c-gray);
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.account__border-box {
+  min-height: 310px;
+  margin-bottom: 40px;
+}
+
+.vacancies__list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 43px 25px;
+}
+.vacancies__item {
+}
+.vacancies__link {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fz-l);
+}
+.vacancies__title {
+  color: var(--c-blue);
+  font-weight: 700;
+}
+.vacancies__text {
+  color: var(--c-gray);
+  padding: 15px 0;
+}
+.vacancies__price {
+  font-weight: 700;
+}
+.account__container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 100px;
+  grid-gap: 5%;
+}
+.account__box {
+  width: 50%;
+  min-height: 450px;
+}
+.link__list {
+  margin-bottom: 40px;
+}
+.link__item {
+  margin-bottom: 20px;
+}
+.link__item:last-child {
+  margin-bottom: 0;
+}
+.link__link {
+  font-size: var(--fz-l);
+  display: block;
+  padding: 10px 30px;
+  background-color: var(--c-cyan);
+  border-radius: 0.5rem;
+}
+.link__button {
+  width: 50%;
+  min-width: 250px;
+  text-align: center;
+  padding: 10px 30px;
+  margin: 0 auto;
+}
+.account__development {
+}
+
+.company__time {
+  color: var(--c-gray);
+  text-align: center;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.company__box-link {
+  margin-bottom: 30px;
+}
+
+.company__link {
+  display: flex;
+  align-items: center;
+  font-size: var(--fz-s);
+  margin-bottom: 10px;
+}
+
+.company__link:last-child {
+  margin-bottom: 0;
+}
+
+.company__link span {
+  color: var(--c-blue);
+}
+
+.company__link img {
+  width: 25px;
+  aspect-ratio: 1/1;
+  margin-right: 5px;
+}
+
+.account__border-box__resume {
+  height: 590px;
+}
+
+.popup__wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--c-gray);
+  margin-bottom: 100px;
+  padding: 30px 0;
+}
+
+.popup {
+  margin: 0 auto;
+  border: 1px solid var(--c-gray);
+  padding: 40px 60px;
+  border-radius: 0.5rem;
+  background-color: var(--c-light);
+}
+
+.popup button {
+  display: block;
+  margin: 0 auto;
+}
+
+/* Эти 2 класса для демонстрации, просто удали */
+.filter__container,
+.registration__container {
+  width: 100%;
+  margin: 50px auto;
+}
+
+.registration__inner {
+  width: 60%;
+  margin: 0 auto;
+}
+
+.registration__label {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.form__status-link {
+  color: var(--c-blue);
+  transition: all 0.3s ease-in-out;
+}
+.form__status-link:hover {
+  color: var(--c-red);
+}
+
+.registration__link {
+  display: block;
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--c-blue);
+  font-weight: 700;
+}
+
+.filter__inner {
+  width: 25%;
+  margin: 0 auto;
+}
+.filter__inner .account__border {
+  padding: 20px;
+}
+
+.filter__form-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter__form-content {
+  font-size: var(--fz-s);
+}
+
+.filter__button {
+  margin-bottom: 0;
+}
+
+/* interview */
+
+/* main */
+
+.main {
+  display: block;
+  padding: 30px 0;
+}
+
+.search__title {
+  font-size: var(--fz-xxl);
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+}
+
+.search__subtitle {
+  font-size: var(--fz-xl);
+  margin: 15px 0;
+}
+
+.features-options__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+.features-options__button,
+.features-options__button-empty {
+  font-size: var(--fz-l);
+  background-color: var(--c-light);
+  padding: 7px 15px;
+  border: 1px solid var(--c-gray);
+  border-radius: 0.9rem / 0.9rem;
+  transition: all 0.3s;
+}
+.features-options__button-empty {
+  cursor: default;
+}
+.features-options__button {
+  cursor: pointer;
+  .features-options:hover {
+    background-color: var(--c-blue);
+    color: var(--c-white);
+    border-color: var(--c-blue);
+  }
+}
+
+.active {
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-color: var(--c-blue);
+}
+
+.search__box-input {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 6fr 1fr;
+  font-size: var(--fz-l);
+  margin-bottom: 20px;
+}
+
+.search__select {
+  border: 1px solid var(--c-gray);
+  padding: 20px;
+  width: 100%;
+}
+.search__select-left {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+.search__input {
+  border: 1px solid var(--c-gray);
+  padding: 20px;
+}
+
+.search__button {
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-light);
+  transition: all 0.3s;
+  cursor: pointer;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.search__button:hover {
+  background-color: var(--c-red);
+}
+
+.search__content {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 20px;
+}
+.search__content-box {
+}
+.search__input-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.search__content-input {
+  border: 1px solid var(--c-gray);
+  padding: 15px;
+  font-size: var(--fz-l);
+  border-radius: 0.5rem;
+  width: 30%;
+}
+.search__content-aside {
+}
+
+    .features-options__inner {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+ .features-options__inner {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-options__item {
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.features-options__item:nth-child(6) {
+  order: 100; /* Перемещаем Junior в конец */
+}
+
+.features-options__item:nth-child(7),
+.features-options__item:nth-child(8) {
+  order: 101; /* Middle и Senior остаются после Junior */
+}
+
+ .features-options__button {
+    border-radius: 60px;
+    border: 1px solid rgba(169, 169, 169, 0.70);
+
+    font-family: Arial, sans-serif;
+
+    color: black;
+    transition: all 0.3s ease-in-out;
+}
+
+.features-options__button:hover {
+    background-color: rgba(169, 169, 169, 0.3);
+}
+
+.features-options__button.selected {
+    background-color: var(--c-blue);
+    color: white;
+}
+
+</style>
+
+<script>
+document.querySelectorAll('.features-options__button').forEach(button => {
+    button.addEventListener('click', function() {
+        this.classList.toggle('selected');  // Переключаем класс
+    });
+});
+</script>
+
+<footer>
+    &copy; 2024 IT-WorkRu. Все права защищены.
+</footer>
+
+</body>
+
+</html>
+
+
+
+
+

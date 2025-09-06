@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>IT-WorkRu - интеллектуальная платформа для поиска вакансий и образовательных ресурсов</title>
+    {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/png">
+    <style>
+
+        html, body {
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Убираем горизонтальную прокрутку */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Растягиваем шапку на всю ширину */
+            box-sizing: border-box;
+        }
+        header a {
+            text-decoration: none;
+            color: #000;
+            margin-right: 35px;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #0056b3;
+        }
+        .login-btn {
+            font-weight: bold;
+            background-color: #0056b3;
+            color: #fff;
+            padding: 10px 23px;
+            border-radius: 12px;
+            text-decoration: none;
+        }
+        .login-btn:hover {
+            background-color: #003f8c;
+            color: white;
+        }
+        .main-content {
+            position: relative;
+            text-align: center;
+            min-height: 100vh; /* Обеспечивает, что main-content занимает минимум 100% высоты экрана */
+            padding: 20px;
+        }
+        .main-content h1 {
+            font-size: 32px;
+            color: #333;
+        }
+        .main-content p {
+            font-size: 18px;
+            color: #333;
+        }
+        .search-box {
+            margin-top: 45px;
+            display: flex;
+            align-items: center;
+            border: 2px solid #DCDCDC; /* Граница для всего блока */
+            border-radius: 5px; /* Скругление углов всего блока */
+
+        }
+
+        .search-box input[type="text"] {
+            padding-top: 17.5px; padding-bottom: 17.5px; padding-left: 23px;
+            width: 400px; /* Увеличение ширины */
+            font-size: 16px;
+            border: none; /* Убираем границу у input */
+            flex-grow: 1; /* Дает input занимать доступное пространство */
+        }
+
+        .search-box button {
+            padding: 19px 20px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #003f8c;
+        }
+        .search-box input[type="text"]:focus {
+        outline: none; /* Добавляем свою рамку при фокусе */
+        }
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            font-size: 14px;
+            color: #f0f0f0;
+        }
+/* Для контейнера выпадающего списка */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Скрытый контент выпадающего списка */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    top: 240%; /* Используем позиционирование для отображения списка */
+    text-align: left;
+}
+
+/* Псевдоэлемент для создания буферной зоны */
+.dropdown::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 46px; /* Высота буферной зоны */
+    background: transparent;
+    z-index: 0;
+}
+
+/* Показываем выпадающий список при наведении */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Оформление ссылок внутри выпадающего списка */
+.dropdown-content a {
+    display: block;
+    padding: 12px 16px; /* Добавляем отступы внутри элементов */
+    width: 100%; /* Ссылка занимает всю ширину */
+    box-sizing: border-box; /* Включаем отступы и границы в размеры элемента */
+    color: black;
+    text-decoration: none;
+}
+
+/* При наведении на ссылку изменяется цвет фона по всей ширине */
+.dropdown-content a:hover {
+    background-color: #f0f0f0; /* Более светлый цвет фона */
+    border: none; /* Убираем границы */
+    color: #0056b3; /* Изменяем цвет текста */
+}
+
+/* Стили для изображений в левом верхнем и правом нижнем углах */
+.main-content img:first-of-type {
+    position: absolute;
+    top: -20px;
+    left: 0px;
+    width: 280px; /* Настройте размер изображения по необходимости */
+    height: auto;
+}
+.main-content img:last-of-type {
+    position: absolute;
+    bottom: 140px;
+    right: 0px;
+    width: 550px; /* Настройте размер изображения по необходимости */
+    height: auto;
+}
+           .container {max-width: 1200px;
+width: 100%;
+margin: 0 auto;
+
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+    </style>
+</head>
+<body>
+
+<header style="border-bottom: 4px solid #0056b3; display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;">
+    <div class="container">
+    <div>
+        <style>  .no-select {
+        user-select: none; /* Запрет выделения текста */
+        -webkit-user-select: none; /* Для WebKit-браузеров */
+        -moz-user-select: none; /* Для Firefox */
+        -ms-user-select: none; /* Для старых IE */
+    } </style>
+        <a class="no-select" href="../" style="font-family: Arial, sans-serif; font-size: 24px; font-weight: 800; color: #0056b3; text-decoration: none;">
+            IT-Work<span style="color: #FD494C;">Ru</span>
+        </a>
+    </div>
+        {% if not user.is_authenticated %}
+    <div style="display: flex; gap: 20px; align-items: center;">
+
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Работодателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти сотрудника</a>
+                <a href="../page_vacancy">Разместить вакансию</a>
+                <a href="../register_employer">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="#" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Соискателям</a>
+            <div class="dropdown-content">
+                <a href="../finder">Найти работу</a>
+                <a href="../page_resume">Создать резюме</a>
+                <a href="../register_applicant">Зарегистрироваться</a>
+            </div>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+        {% else %}
+
+        {% if user.role == "applicant" %}
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти работу</a>
+        </div>
+                <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_resume" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Создать резюме</a>
+        </div>
+
+     </div>
+        {% else %}
+
+ <div style="display: flex; gap: 20px; align-items: right;">
+                <div class="dropdown">
+            <a href="../finder" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Найти сотрудника</a>
+        </div>
+        <div class="dropdown">
+            <a href="../blog" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Блог</a>
+        </div>
+                <div class="dropdown">
+            <a href="../page_vacancy" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Разместить вакансию</a>
+        </div>
+
+</div>
+
+
+
+
+
+        {% endif %}
+
+
+         {% endif %}
+        {% if user.is_authenticated %}
+        <div class="dropdown" id="dropdown-important" style="display: flex; flex-direction: row;">
+
+        <img style="width: 38px; border-radius: 50%;" src="{% static 'profile.png' %}" alt="profile">
+        <div style="margin-left: 15px; text-align: left;">
+
+
+            <span style="color: #2A3137; font-size: 18px; font-family: Arial; font-weight: 700; word-wrap: break-word; display: block;">
+                {{ user.first_name }} {{ user.last_name }}
+            </span>
+            <span style="color: #A1A1A1; font-size: 16px; font-family: Arial; font-weight: 400; word-wrap: break-word; display: block;">
+                {{ user.email }}
+            </span>
+
+
+        </div>
+
+        <img class="rotating-image_1"
+     style="cursor: pointer; margin-top: 10px; margin-left: 16px; width: 13px; height: 20px; transform: rotate(-180deg); transition: transform 0.3s ease;"
+     src="{% static 'Down.png' %}"
+     alt="Down" />
+                   <div class="dropdown-content" style="margin-top: -40px; min-width: 300px; top: 240%;">
+                        {% if user.role == "applicant" %}
+                        <a href="../featured_jobs" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;"><img style="width: 23px; border-radius: 80%; margin-left: -3px; margin-bottom: -4px; padding-right: 7px;" src="{% static 'love_vacancies.png' %}" alt="love_vacancies">Избранные вакансии (0)</a>
+                        <a href="../person_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../person_account#my_resumes" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Мои резюме (0)</a>
+                       <a href="../person_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../person_account/#employers_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики работодателей (0)</a>
+                        <a href="../page_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_person/#change_password_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../person_account/#current_balance_applicant" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_person_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../person_account?action=openPopup_person" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% else %}
+                        <a href="../company_notifications" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Уведомления (0)</a>
+                        <a href="../company_account#my_vacancies" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Вакансии компании (0)</a>
+                        <a href="../company_account" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Личный кабинет</a>
+                       <a href="../company_account#applicants_responses" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Отклики соискателей (0)</a>
+                        <a href="../page_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Редактировать данные</a>
+                       <a href="../page_company#change_password_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Изменить пароль</a>
+                       <a href="../company_account#current_balance_employer" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Текущий баланс: 0 руб.</a>
+                       <a href="../payment_company_history" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">История платежей</a>
+                       <a href="../company_account?action=openPopup_company" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Пополнить баланс</a>
+                       {% endif %}
+<a href="#" onclick="logout()" style="display: flex; align-items: center;">
+    <img style="width: 23px; border-radius: 80%;  margin-left: -3px; margin-top: -2px; padding-right: 7px;" src="{% static 'exit_image_1.png' %}" alt="exit_image">
+    <span style=" font-family: Arial, sans-serif; font-size: 16px;">Выйти</span>
+</a>
+
+
+            </div>
+
+        </div>
+        {% else %}
+        <a href="../login" class="login-btn" style="font-family: Arial, sans-serif; font-size: 16px; text-decoration: none;">Войти</a>
+        {% endif %}
+
+
+
+
+    </div></div>
+</header>
+<script>
+// Получаем контейнер по ID
+const dropdownContainer = document.getElementById('dropdown-important');
+
+// Получаем стрелку
+const rotatingImage = dropdownContainer.querySelector('.rotating-image_1');
+
+// Добавляем обработчики событий на весь контейнер
+dropdownContainer.addEventListener('mouseover', () => {
+    rotatingImage.style.transform = 'rotate(0deg)'; // Поворачиваем стрелку вверх
+});
+
+dropdownContainer.addEventListener('mouseout', () => {
+    rotatingImage.style.transform = 'rotate(-180deg)'; // Возвращаем стрелку вниз
+});
+
+
+
+    function logout() {
+        fetch('{% url "logout" %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                // Если выход успешен, обновите интерфейс или перезагрузите страницу
+                location.reload();  // Перезагрузка страницы
+            }
+        })
+        .catch(error => console.error('Ошибка при выходе:', error));
+    }
+</script>
+
+<style>
+
+     :root {
+  --c-black: #000000;
+  --c-dark: #202020;
+  --c-white: #ffffff;
+  --c-light: #eeeeee;
+  --c-gray: #bbbbbb;
+  --c-cyan: #afc4e4;
+  --c-blue: #1D55A6;
+  --c-red: #f66766;
+
+  --fz-s: 14px;
+  --fz-m: 16px;
+  --fz-l: 18px;
+  --fz-xl: 24px;
+  --fz-xxl: 36px;
+}
+
+.btn {
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-white);
+  color: var(--c-blue);
+  border-radius: 0.5rem;
+  border: 1px solid var(--c-blue);
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn:hover {
+  background-color: var(--c-blue);
+  color: var(--c-white);
+}
+
+
+.account__title-button {
+  font-size: var(--fz-l);
+  padding: 10px 30px;
+}</style>
+<div class="main-content">
+    <h2>Уведомления соискателя</h2><br>
+
+    {% if interviews %}
+    {% for interview in interviews %}
+        <div style="background-color: #0d6efd; color: white; padding: 1.5rem 2rem; width: 97.7%; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; border-radius: 8px; margin-bottom: 1rem;">
+            <div>
+                📢 У вас новое интервью по вакансии <strong>{{ interview.vacancy }}</strong>
+            </div>
+            <a href="http://127.0.0.1:8000/interview_applicant_main/{{ interview.unique_link }}" style="text-decoration: none;">
+            <!--<a href="https://disruptively-trustful-oryx.cloudpub.ru/interview_applicant_main/{{ interview.unique_link }}" style="text-decoration: none;">-->
+                <button class="btn account__title-button">Перейти к интервью</button>
+            </a>
+        </div>
+    {% endfor %}
+{% else %}
+    <div style="background-color: #6c757d; color: white; padding: 1rem; width: 100%; text-align: center; border-radius: 8px;">
+        Пока нет новых уведомлений.
+    </div>
+{% endif %}
+
+</div>
+
+
+<footer>
+    &copy; 2024 IT-WorkRu. Все права защищены.
+</footer>
+
+</body>
+</html>
