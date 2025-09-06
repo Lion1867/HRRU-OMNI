@@ -1,0 +1,19 @@
+cmd
+
+1.
+cd IT-WorkRu
+.\platform_venv\Scripts\activate
+cd myplatform       
+python manage.py runserver      
+cd ..
+
+2.
+cd interview_module
+.venv\Scripts\activate
+python text_audio_questions_api.py
+cd ..
+
+3.
+cd Real_time_HR
+.venv\Scripts\activate
+python real_talking_avatar_api.py

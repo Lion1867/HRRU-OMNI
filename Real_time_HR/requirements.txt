@@ -27,3 +27,4 @@ python-decouple
 lipsync
 rdflib
 requests
+python-dotenv
