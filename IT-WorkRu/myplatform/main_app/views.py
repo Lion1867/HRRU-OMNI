@@ -795,7 +795,8 @@ from django.core.exceptions import ValidationError
 import os
 from urllib.parse import urlparse
 from django.conf import settings
-
+import base64
+import uuid
 
 def create_interview(request):
     if request.method == 'POST':
@@ -814,6 +815,7 @@ def create_interview(request):
             vacancy_company = data.get('vacancy_company')
             applicant_name = data.get('applicant_name')
             applicant_last_name = data.get('applicant_last_name')
+            hr_photo_base64 = data.get('image')
 
             # Проверка обязательных полей
             required_fields = [
@@ -865,7 +867,15 @@ def create_interview(request):
                 hr_name=data.get('agent_name')
             )
             print(f"Интервью создано: {interview}")
-
+            
+             # Сохраняем фото, если есть
+            if hr_photo_base64 and hr_photo_base64.startswith("data:image"):
+                format, imgstr = hr_photo_base64.split(';base64,')  
+                ext = format.split('/')[-1]  
+                file_name = f"{uuid.uuid4()}.{ext}"
+                interview.hr_photo = ContentFile(base64.b64decode(imgstr), name=file_name)
+                interview.save()
+                
             # Скачивание видео по ссылке и сохранение в модель InterviewQuestion
             interview_result = data.get('interview_result', {})
             questions_data = interview_result.get('original_questions', {})

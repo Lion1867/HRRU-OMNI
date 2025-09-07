@@ -193,6 +193,8 @@ async def interview_pipeline(
     # generated_questions = generate_interview_questions(position, skills, remaining_questions)
     generated_questions = {
         "question": f"Здравствуйте! Я ваш виртуальный HR-ассистент. Сегодня поговорим о вашем опыте и навыках, чтобы лучше понять, как они соотносятся с требованиями на позицию {position.lower()}. Как могу к вам обращаться?"
+        #"question": f"Здравствуйте!"
+
     }
 
     # Если предоставлены приоритетные вопросы, добавляем их в конец списка

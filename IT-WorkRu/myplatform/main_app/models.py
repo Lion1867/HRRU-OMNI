@@ -219,6 +219,12 @@ class Interview(models.Model):
         blank=True,  # Это поле может быть пустым, если HR не указан
         null=True
     )
+    hr_photo = models.ImageField(  # новое поле
+        upload_to='hr_photos/',
+        verbose_name=_('Фото рекрутера'),
+        blank=True,
+        null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата создания'))
     unique_link = models.CharField(max_length=255, unique=True, verbose_name=_('Уникальная ссылка'), default=uuid.uuid4)
 

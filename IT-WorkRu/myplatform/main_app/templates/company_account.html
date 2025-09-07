@@ -3067,6 +3067,7 @@ async function createInterview(data) {
           applicantRole,
           gender,
           agentName,
+          image: base64Photo,
           interview_result: result
         });
       } catch (error) {
@@ -3116,6 +3117,7 @@ async function createInterview(data) {
         applicantRole,
         gender,
         agentName,
+        image, 
         interview_result
       } = data;
 
@@ -3135,6 +3137,7 @@ async function createInterview(data) {
         applicant_role: applicantRole,
         gender: gender,
         agent_name: agentName,
+        image: image,
         interview_result: interview_result
       };
 
