@@ -1,0 +1,7 @@
+requests
+docx2txt
+striprtf
+python-dotenv
+fastapi
+python-multipart
+uvicorn

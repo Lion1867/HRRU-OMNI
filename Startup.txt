@@ -17,3 +17,9 @@ cd ..
 cd Real_time_HR
 .venv\Scripts\activate
 python real_talking_avatar_api.py
+cd ..
+
+4.
+cd parsing_llm
+.venv\Scripts\activate
+python api_parsing.py

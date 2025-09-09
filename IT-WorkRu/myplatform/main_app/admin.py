@@ -86,3 +86,56 @@ class VacancyResponseAdmin(admin.ModelAdmin):
 @admin.register(VideoResponse)
 class VideoResponseAdmin(admin.ModelAdmin):
     list_display = ('question', 'file', 'uploaded_at')
+
+
+from .models import Resume
+
+# Inline для отображения резюме внутри профиля пользователя
+class ResumeInline(admin.TabularInline):  # или admin.StackedInline
+    model = Resume
+    extra = 0  # не показывать пустые формы по умолчанию
+    readonly_fields = ('created_at', 'updated_at')
+    fields = (
+        'specialization',
+        'key_skills',
+        'key_responsibilities',
+        'work_experience',
+        'general_experience_number',
+        'created_at',
+        'updated_at'
+    )
+    can_delete = True
+    show_change_link = True  # позволяет перейти к полной форме редактирования
+
+
+# Регистрируем Resume отдельно (если нужно)
+@admin.register(Resume)
+class ResumeAdmin(admin.ModelAdmin):
+    list_display = (
+        'user',
+        'specialization',
+        'general_experience_number',
+        'created_at',
+        'updated_at'
+    )
+    list_filter = ('specialization', 'created_at')
+    search_fields = ('user__email', 'user__first_name', 'user__last_name', 'specialization')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('Основное', {
+            'fields': ('user', 'specialization', 'general_experience_number')
+        }),
+        ('Навыки и обязанности', {
+            'fields': ('key_skills', 'key_responsibilities'),
+            'classes': ('collapse',)  # свернуто по умолчанию
+        }),
+        ('Опыт работы', {
+            'fields': ('work_experience',),
+            'classes': ('collapse',)
+        }),
+        ('Служебное', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+

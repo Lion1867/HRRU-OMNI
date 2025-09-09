@@ -30,4 +30,5 @@ urlpatterns = [
     path('api/interview/update-match/', views.update_interview_match, name='update_interview_match'),
     path('save_interview_video_response/', views.save_interview_video_response, name='save_interview_video_response'),
     path('interview-details/<int:interview_id>/', views.get_interview_details, name='interview_details'),
+    path('api/resume/save/', views.save_resume, name='save_resume'),
 ]

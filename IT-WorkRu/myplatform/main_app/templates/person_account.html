@@ -979,11 +979,201 @@ dropdownContainer.addEventListener('mouseout', () => {
     <div class="account__border account__border-box" id="my_resumes">
       <div class="account__border-title-wrapper" >
         <h3 class="account__border-title" >Мои резюме</h3>
-        <div class="account__border-button btn">Создать резюме</div>
+
+
+
+
+<style>
+      .btn_new {z-index: 0;
+  font-size: var(--fz-m);
+  font-weight: 700;
+  background-color: var(--c-blue);
+  color: var(--c-white);
+  border-radius: 0.5rem;
+  border: 1px solid #007bff;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+  text-align: center;
+}
+.btn_new:hover {
+  background-color: var(--c-white);
+  color: var(--c-blue);
+}
+</style>
+<!-- Кнопка (если её ещё нет — можно оставить вашу) -->
+<div class="account__border-button btn_new" id="uploadResumeBtn">Загрузить резюме</div>
+
+<!-- Скрытый инпут для выбора файла -->
+<input type="file" id="resumeFileInput" accept=".docx,.rtf" style="display: none;" />
+
+<script>
+document.getElementById('uploadResumeBtn').addEventListener('click', async function() {
+    const fileInput = document.getElementById('resumeFileInput');
+    fileInput.click();
+
+    fileInput.onchange = async function() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.docx') && !file.name.toLowerCase().endsWith('.rtf')) {
+            alert("Пожалуйста, выберите файл .docx или .rtf");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            console.log("📤 Отправляем файл на FastAPI:", file.name);
+
+            // 1. Шаг — отправка в FastAPI
+            const fastApiResponse = await fetch('http://127.0.0.1:8005/parse-resume', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!fastApiResponse.ok) {
+                const errorText = await fastApiResponse.text();
+                throw new Error(`FastAPI: ${errorText}`);
+            }
+
+            const result = await fastApiResponse.json();
+            console.log("✅ Ответ от FastAPI:", result);
+
+            // 2. Шаг — отправка в Django
+            console.log("📤 Отправляем JSON в Django...");
+
+            const djangoResponse = await fetch('/api/resume/save/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie_34('csrftoken')  // 👈 CSRF токен (см. ниже)
+                },
+                body: JSON.stringify(result)
+            });
+
+            const djangoResult = await djangoResponse.json();
+            console.log("✅ Ответ от Django:", djangoResult);
+
+            if (djangoResult.status === 'success') {
+                alert("Резюме успешно сохранено в базу данных!");
+            } else {
+                alert("Ошибка сохранения: " + djangoResult.message);
+            }
+
+        } catch (error) {
+            console.error("❌ Ошибка:", error);
+            alert("Ошибка: " + error.message);
+        }
+    };
+});
+
+// Функция для получения CSRF токена (обязательно для Django)
+function getCookie_34(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+
+
+
+
+
       </div>
-      <div class="account__border-content">
-        У вас пока нет ни одного резюме.
-      </div>
+<style>
+.account-resume-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    font-size: 14px;
+    color: #495057;
+    flex-wrap: wrap;
+}
+
+.account-resume-card > div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.account-resume-card i {
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.account-resume-card strong {
+    font-weight: 600;
+    color: #333;
+}
+
+.account-resume-card .resume-meta {
+    margin-left: auto;
+    font-size: 16px;
+    color: #888;
+    white-space: nowrap;
+}
+
+/* Адаптивность на мобильных */
+@media (max-width: 768px) {
+    .account-resume-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .account-resume-card > div {
+        flex-wrap: wrap;
+    }
+    .account-resume-card .resume-meta {
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+</style>
+
+{% if resume %}
+    <div class="account__border-content" style="padding: 0; background: transparent; border: none; z-index: -1;">
+        <div class="account-resume-card">
+
+            <div>
+                <i>🎯</i> <strong>{{ resume.specialization|default:"Не указана" }}</strong>
+            </div>
+
+
+
+            <div>
+                <i>⏳</i> {{ resume.general_experience_number|default:"Стаж не указан" }}
+            </div>
+
+            <div class="resume-meta">
+                Обновлено: {{ resume.updated_at|date:"d.m.Y" }}
+            </div>
+
+        </div>
+    </div>
+
+{% else %}
+    <div class="account__border-content" style="z-index: -1; padding: 30px; text-align: center; color: #888;">
+        У вас пока нет ни одного резюме.<br>
+        <!-- <a href="{% url 'create_resume' %}" style="color: #007bff; text-decoration: underline; margin-top: 10px; display: inline-block;">Создать резюме</a> -->
+    </div>
+{% endif %}
+
     </div>
     <div class="account__border">
       <h3 class="account__border-title">Рекомендуем вакансии:</h3>

@@ -14,6 +14,10 @@ Real_time_HR/SadTalker
 Real_time_HR/.env
 Real_time_HR/__pycache__
 interview_module/__pycache__
+parsing_llm/.idea
+parsing_llm/.venv
+parsing_llm/__pycache__
+parsing_llm/.env
 
 *.webm
 *.ogg

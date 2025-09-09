@@ -188,8 +188,14 @@ def company_account(request):
         'existing_interviews_json': existing_interviews_json
     })
 
+@login_required  
 def person_account(request):
-    return render(request, 'person_account.html')
+    # Получаем резюме текущего пользователя
+    resume = Resume.objects.filter(user=request.user).first()  # Берём первое (или можно last() — по дате обновления)
+
+    return render(request, 'person_account.html', {
+        'resume': resume  # Передаём резюме в шаблон (None, если нет)
+    })
 
 @login_required
 def page_company(request):
@@ -319,6 +325,10 @@ def interview_applicant_main(request, unique_link):
     # Получаем вакансию, связанную с интервью
     vacancy = interview.vacancy
 
+    resume = None
+    if hasattr(interview, 'applicant') and interview.applicant:
+        resume = Resume.objects.filter(user=interview.applicant).first()
+        
     # Передаем данные в шаблон
     return render(
         request,
@@ -326,7 +336,8 @@ def interview_applicant_main(request, unique_link):
         {
             'interview': interview,
             'questions': questions,  # Передаем все вопросы в шаблон
-            'vacancy': vacancy
+            'vacancy': vacancy,
+            'resume': resume,
         }
     )
 
@@ -875,7 +886,7 @@ def create_interview(request):
                 file_name = f"{uuid.uuid4()}.{ext}"
                 interview.hr_photo = ContentFile(base64.b64decode(imgstr), name=file_name)
                 interview.save()
-                
+
             # Скачивание видео по ссылке и сохранение в модель InterviewQuestion
             interview_result = data.get('interview_result', {})
             questions_data = interview_result.get('original_questions', {})
@@ -1088,3 +1099,43 @@ def get_interview_details(request, interview_id):
     formatted_summary = interview.summary if hasattr(interview, 'summary') else ''
 
     return JsonResponse({'summary': formatted_summary, 'questions': data}, encoder=DjangoJSONEncoder)
+
+
+from .models import Resume
+@csrf_exempt
+@login_required
+def save_resume(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Только POST-запросы разрешены'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+
+        specialization = data.get('specialization', '')
+        key_skills = data.get('key_skills', [])
+        key_responsibilities = data.get('key_responsibilities', [])
+        work_experience = data.get('work_experience', [])
+        general_experience_number = data.get('general_experience_number', [''])[0]  # первый элемент
+
+        resume, created = Resume.objects.update_or_create(
+            user=request.user,
+            defaults={
+                'specialization': specialization,
+                'key_skills': key_skills,
+                'key_responsibilities': key_responsibilities,
+                'work_experience': work_experience,
+                'general_experience_number': general_experience_number,
+            }
+        )
+
+        status = "создано" if created else "обновлено"
+        return JsonResponse({
+            'status': 'success',
+            'message': f'Резюме успешно {status}',
+            'resume_id': resume.id
+        }, status=201)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Некорректный JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

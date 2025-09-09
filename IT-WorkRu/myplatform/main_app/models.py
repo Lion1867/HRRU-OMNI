@@ -350,3 +350,52 @@ class VideoResponse(models.Model):
 
     def __str__(self):
         return f'Ответ на вопрос {self.question.id} от {self.uploaded_at}'
+
+from django.conf import settings
+class Resume(models.Model):
+    user = models.ForeignKey(  # ← Исправлено с 'employer' на 'user'
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='resumes',
+        verbose_name='Соискатель'
+    )
+
+    specialization = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='Специализация'
+    )
+
+    key_skills = models.JSONField(
+        default=list,
+        verbose_name='Ключевые навыки'
+    )
+
+    key_responsibilities = models.JSONField(
+        default=list,
+        verbose_name='Ключевые обязанности'
+    )
+
+    work_experience = models.JSONField(
+        default=list,
+        verbose_name='Опыт работы (описание)'
+    )
+
+    general_experience_number = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name='Общий стаж (в годах)'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+
+    class Meta:
+        verbose_name = 'Резюме'
+        verbose_name_plural = 'Резюме'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Резюме {self.user} — {self.specialization or 'без специализации'}"
