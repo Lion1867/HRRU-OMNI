@@ -23,7 +23,7 @@ import os
 SECRET_KEY = os.getenv('PLATFORM_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('PLATFORM_DEBUG').lower() == 'true'
+DEBUG = os.getenv('PLATFORM_DEBUG') == 'true'
 
 ALLOWED_HOSTS = [os.getenv('PLATFORM_ALLOWED_HOSTS')]
 
