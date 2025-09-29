@@ -14,7 +14,7 @@ librosa
 numpy
 python-multipart
 pyttsx3
-ttsmaker
+#ttsmaker
 TeraTTS
 ruaccent
 rhvoice_wrapper

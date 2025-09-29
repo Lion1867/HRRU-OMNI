@@ -42,9 +42,9 @@ if env_path.exists():
 SECRET_KEY = os.getenv('PLATFORM_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('PLATFORM_DEBUG') == 'true'
+DEBUG = True
 
-ALLOWED_HOSTS = [os.getenv('PLATFORM_ALLOWED_HOSTS')]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -140,7 +140,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -162,9 +162,7 @@ AUTHENTICATION_BACKENDS = [
 
 import os
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -174,11 +172,11 @@ CORS_ALLOWED_ORIGINS = [
     # Добавьте другие доверенные домены, если нужно
 ]
 
-SESSION_COOKIE_SECURE=True
+SESSION_COOKIE_SECURE=False
 
-SESSION_COOKIE_SAMESITE='None'
+# SESSION_COOKIE_SAMESITE='None'
 
-CSRF_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=False
 
 CORS_ALLOW_ALL_ORIGINS = True
 

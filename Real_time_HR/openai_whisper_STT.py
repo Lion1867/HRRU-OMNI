@@ -6,8 +6,10 @@ import librosa
 os.environ["PATH"] += os.pathsep + r"E:\ffmpeg-7.1-full_build\bin"
 
 # Загрузка модели Whisper (large-v3) с использованием CPU
-model = whisper.load_model("large-v3", device="cuda")
-
+# model = whisper.load_model("large-v3", device="cuda")
+import torch
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model = whisper.load_model("large-v3", device=device)
 
 # Функция для загрузки аудиофайла
 def load_audio(file_path):

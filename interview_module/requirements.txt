@@ -1,6 +1,6 @@
-torchaudio
+#torchaudio
 omegaconf
-torch
+#torch
 fastapi
 uvicorn
 sounddevice
@@ -14,7 +14,7 @@ librosa
 numpy
 python-multipart
 pyttsx3
-ttsmaker
+#ttsmaker
 TeraTTS
 ruaccent
 rhvoice_wrapper
@@ -25,3 +25,4 @@ soundfile
 speechkit
 python-decouple
 lipsync
+protobuf==3.20.3

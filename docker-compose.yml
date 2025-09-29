@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  it-workru:
+    build: ./IT-WorkRu/myplatform
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: unless-stopped
+
+
+  parsing-llm:
+    build: ./parsing_llm
+    ports:
+      - "8005:8005"
+    restart: unless-stopped
+
+  interview-module:
+    build: ./interview_module  
+    ports:
+      - "8122:8122"
+    volumes:
+      - whisper_cache:/root/.cache/whisper
+    restart: unless-stopped
+
+  real-time-hr:
+    build: ./Real_time_HR  
+    ports:
+      - "8101:8101"
+    volumes:
+      - whisper_cache:/root/.cache/whisper
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  whisper_cache:

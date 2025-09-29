@@ -1,6 +1,7 @@
 IT-WorkRu/.idea
 IT-WorkRu/.venv
 IT-WorkRu/myplatform/.env
+.env
 IT-WorkRu/platform_venv
 interview_module/.idea
 interview_module/.venv
