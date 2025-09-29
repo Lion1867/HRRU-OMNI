@@ -208,4 +208,4 @@ curl -X POST "http://localhost:8005/parse-resume/"      -H "accept: application/
 Проект создан в образовательных целях.  
 © 2025 [Lion1867](https://github.com/Lion1867)
 
-> *Собрано с любовью с использованием Django, FastAPI, PostgreSQL, PyTorch и Docker.*
+> *Собрано с использованием Django, FastAPI, PostgreSQL, PyTorch и Docker.*
