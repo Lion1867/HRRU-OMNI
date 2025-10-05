@@ -31,4 +31,5 @@ urlpatterns = [
     path('save_interview_video_response/', views.save_interview_video_response, name='save_interview_video_response'),
     path('interview-details/<int:interview_id>/', views.get_interview_details, name='interview_details'),
     path('api/resume/save/', views.save_resume, name='save_resume'),
+    path('admin_util/export-xlsx/', views.admin_export, name='admin_export_xlsx'),
 ]

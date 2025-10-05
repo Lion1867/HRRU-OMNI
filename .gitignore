@@ -1,6 +1,8 @@
 IT-WorkRu/.idea
 IT-WorkRu/.venv
 IT-WorkRu/myplatform/.env
+IT-WorkRu/myplatform/.coveragerc
+IT-WorkRu/myplatform/.coverage
 .env
 IT-WorkRu/platform_venv
 interview_module/.idea

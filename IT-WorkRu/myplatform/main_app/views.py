@@ -374,40 +374,40 @@ def save_answer(request):
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-def calculate_time_posted(published_at: str) -> str:
-    published_time = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%S")
-    current_time = datetime.now()
-    delta = relativedelta(current_time, published_time)
+# def calculate_time_posted(published_at: str) -> str:
+#     published_time = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%S")
+#     current_time = datetime.now()
+#     delta = relativedelta(current_time, published_time)
 
-    # Функция для правильного склонения
-    def get_correct_form(number, forms):
-        if 11 <= number % 100 <= 19:
-            return forms[2]  # форма для 5-20
-        if number % 10 == 1:
-            return forms[0]  # форма для 1
-        if 2 <= number % 10 <= 4:
-            return forms[1]  # форма для 2-4
-        return forms[2]      # форма для остальных случаев
+#     # Функция для правильного склонения
+#     def get_correct_form(number, forms):
+#         if 11 <= number % 100 <= 19:
+#             return forms[2]  # форма для 5-20
+#         if number % 10 == 1:
+#             return forms[0]  # форма для 1
+#         if 2 <= number % 10 <= 4:
+#             return forms[1]  # форма для 2-4
+#         return forms[2]      # форма для остальных случаев
 
-    if delta.years > 0:
-        form = get_correct_form(delta.years, ["год", "года", "лет"])
-        return f"{delta.years} {form} назад"
-    if delta.months > 0:
-        form = get_correct_form(delta.months, ["месяц", "месяца", "месяцев"])
-        return f"{delta.months} {form} назад"
-    if delta.days > 0:
-        form = get_correct_form(delta.days, ["день", "дня", "дней"])
-        return f"{delta.days} {form} назад"
-    if delta.hours > 0:
-        form = get_correct_form(delta.hours, ["час", "часа", "часов"])
-        return f"{delta.hours} {form} назад"
-    if delta.minutes > 0:
-        form = get_correct_form(delta.minutes, ["минута", "минуты", "минут"])
-        return f"{delta.minutes} {form} назад"
-    if delta.seconds > 0:
-        form = get_correct_form(delta.seconds, ["секунда", "секунды", "секунд"])
-        return f"{delta.seconds} {form} назад"
-    return "Только что"
+#     if delta.years > 0:
+#         form = get_correct_form(delta.years, ["год", "года", "лет"])
+#         return f"{delta.years} {form} назад"
+#     if delta.months > 0:
+#         form = get_correct_form(delta.months, ["месяц", "месяца", "месяцев"])
+#         return f"{delta.months} {form} назад"
+#     if delta.days > 0:
+#         form = get_correct_form(delta.days, ["день", "дня", "дней"])
+#         return f"{delta.days} {form} назад"
+#     if delta.hours > 0:
+#         form = get_correct_form(delta.hours, ["час", "часа", "часов"])
+#         return f"{delta.hours} {form} назад"
+#     if delta.minutes > 0:
+#         form = get_correct_form(delta.minutes, ["минута", "минуты", "минут"])
+#         return f"{delta.minutes} {form} назад"
+#     if delta.seconds > 0:
+#         form = get_correct_form(delta.seconds, ["секунда", "секунды", "секунд"])
+#         return f"{delta.seconds} {form} назад"
+#     return "Только что"
 
 
 from django.shortcuts import render
@@ -417,24 +417,24 @@ import re
 
 API_URL = "http://127.0.0.1:8001"  # Убедитесь, что здесь правильный порт
 
-def process_salary(salary_from, salary_to, salary_currency):
-    # Если хотя бы одно поле содержит "не указано"
-    if "не указана" in (salary_from, salary_to, salary_currency):
-        return "з/п не указана"
+# def process_salary(salary_from, salary_to, salary_currency):
+#     # Если хотя бы одно поле содержит "не указано"
+#     if "не указана" in (salary_from, salary_to, salary_currency):
+#         return "з/п не указана"
 
-    # Если валюта "RUR", заменяем на символ рубля
-    if salary_currency == "RUR":
-        salary_currency = "₽"
+#     # Если валюта "RUR", заменяем на символ рубля
+#     if salary_currency == "RUR":
+#         salary_currency = "₽"
 
-    salary_text = ""
-    if salary_from:
-        salary_text += f"от {salary_from} "
-    if salary_to:
-        salary_text += f"до {salary_to} "
-    if salary_currency:
-        salary_text += f"{salary_currency}"
+#     salary_text = ""
+#     if salary_from:
+#         salary_text += f"от {salary_from} "
+#     if salary_to:
+#         salary_text += f"до {salary_to} "
+#     if salary_currency:
+#         salary_text += f"{salary_currency}"
 
-    return salary_text.strip()
+#     return salary_text.strip()
 
 
 def finder(request):
@@ -1139,3 +1139,39 @@ def save_resume(request):
         return JsonResponse({'status': 'error', 'message': 'Некорректный JSON'}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+import pandas as pd
+from django.http import HttpResponse
+from main_app.models import VacancyResponse
+import io
+
+@login_required
+def admin_export(request):
+    # Получаем все отклики
+    responses = VacancyResponse.objects.select_related('vacancy', 'applicant').all()
+
+    # Формируем данные для таблицы
+    data = []
+    for r in responses:
+        responded_at_naive = r.responded_at
+        if responded_at_naive.tzinfo is not None:
+            responded_at_naive = responded_at_naive.replace(tzinfo=None)
+        data.append({
+            "Vacancy Title": r.vacancy.title,
+            "Applicant Email": r.applicant.email,
+            "Responded At": responded_at_naive,
+        })
+
+    df = pd.DataFrame(data, columns=["Vacancy Title", "Applicant Email", "Responded At"])
+
+    # Сохраняем в BytesIO
+    file_like = io.BytesIO()
+    df.to_excel(file_like, index=False)
+    file_like.seek(0)
+
+    response = HttpResponse(
+        file_like.read(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response['Content-Disposition'] = 'attachment; filename="vacancy_responses.xlsx"'
+    return response

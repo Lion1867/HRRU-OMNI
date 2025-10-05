@@ -22,16 +22,16 @@ if env_path.exists():
     with open(env_path, encoding='utf-8') as f:
         for line in f:
             line = line.strip()
-            if not line or line.startswith('#'):
-                continue
+            #if not line or line.startswith('#'):
+                #continue
             if '=' in line:
                 key, value = line.split('=', 1)
                 key = key.strip()
                 value = value.strip()
                 # Убираем кавычки, если есть
-                if (value.startswith('"') and value.endswith('"')) or \
-                   (value.startswith("'") and value.endswith("'")):
-                    value = value[1:-1]
+                #if (value.startswith('"') and value.endswith('"')) or \
+                   #(value.startswith("'") and value.endswith("'")):
+                    #value = value[1:-1]
                 os.environ.setdefault(key, value)
                 
 
