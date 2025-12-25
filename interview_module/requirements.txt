@@ -26,3 +26,5 @@ speechkit
 python-decouple
 lipsync
 protobuf==3.20.3
+pytest==8.4.2
+nisqa==2.0.post2

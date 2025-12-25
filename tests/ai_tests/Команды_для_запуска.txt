@@ -1,0 +1,7 @@
+cd E:\diplom_final_project\tests\ai_tests
+.ai_venv\Scripts\activate           
+python yandex_speechkit_tts_test.py --num_samples 57
+python whisper_stt_test.py --max_samples 57  
+python yandex_llm_test.py --num_samples 57
+(python sadtalker_test.py --image_path "E:\diplom_final_project\tests\ai_tests\animate_data\images\speaker_woman.jpg" --audio_path "E:\diplom_final_project\tests\ai_tests\animate_data\audio\oksana.wav" --output_video "result.mp4")
+python sadtalker_batch_test.py --images_dir "E:\diplom_final_project\tests\ai_tests\animate_data\images" --audios_dir "E:\diplom_final_project\tests\ai_tests\animate_data\audio" --output_dir "E:\diplom_final_project\tests\ai_tests\sadtalker_batch_output" --num_samples 2

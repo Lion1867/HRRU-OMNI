@@ -1,4 +1,5 @@
 @echo off
+@chcp 65001 >nul
 title Django Test Runner + Mini Server (Port 7024)
 
 :: Пути
@@ -17,7 +18,7 @@ echo Переход в директорию Django-приложения...
 cd myplatform
 
 echo Запуск тестов с отчётами...
-pytest ../../tests --ds=myplatform.settings -v ^
+pytest ../../tests/django_tests --ds=myplatform.settings -v ^
 --html="%REPORT%" --self-contained-html ^
 --cov=. --cov-report=term-missing:skip-covered --cov-report=html:"%HTMLCOV%"
 
