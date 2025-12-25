@@ -27,4 +27,4 @@ for i in range(min(300, len(dataset))):
     if (i + 1) % 10 == 0:
         print(f"Сохранено: {i + 1}")
 
-print(f"✅ Готово! Сохранено в: {os.path.abspath(OUTPUT_DIR)}")
+print(f"Готово! Сохранено в: {os.path.abspath(OUTPUT_DIR)}")
